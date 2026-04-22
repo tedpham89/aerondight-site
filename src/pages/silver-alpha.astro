@@ -40,15 +40,17 @@ const colNames: Record<string, string> = {
 
 <Layout
 	title="Silver Alpha Strategy"
-	description="Systematic swing trade strategy: 135 trades, 59% win rate, full trade log transparency."
+	description="Systematic swing trade strategy: 94 trades, 62% win rate, +325% return — full trade log transparency."
 >
 	<div class="left" slot="left">
 		<Card class="toc-card">
 			<h2 class="no-mt">On this page</h2>
 			<ol>
 				<li class="toc-li"><a href="#_top" class="active">Overview</a></li>
+				<li class="toc-li"><a href="#oos-definition">Out-of-Sample Definition</a></li>
 				<li class="toc-li"><a href="#performance">Performance</a></li>
 				<li class="toc-li"><a href="#equity-curve">Equity Curve</a></li>
+				<li class="toc-li"><a href="#disclosures">What's Not Shown</a></li>
 				<li class="toc-li"><a href="#trade-log">Trade Log</a></li>
 			</ol>
 		</Card>
@@ -57,13 +59,22 @@ const colNames: Record<string, string> = {
 		<Card>
 			<h1 class="no-mt" id="_top" style="scroll-margin-top: 2rem;">Silver Alpha Strategy</h1>
 			<p style="color: #c7c7c7; margin-top: 0.5rem;">
-				Systematic swing trade strategy — 2023 to 2025 out-of-sample simulation.
+				Systematic swing trade strategy — 2023 to Q1 2026 out-of-sample simulation.
 			</p>
 
 			<p>
 				Silver Alpha is a swing trade strategy built on Aerondight's multi-factor scoring engine.
 				It uses conviction scores and signal transitions to systematically enter and exit positions
 				in US equities. All decisions are fully systematic — no discretionary overrides.
+			</p>
+
+			<h2 id="oos-definition" style="scroll-margin-top: 4rem;">Out-of-Sample Definition</h2>
+
+			<p>
+				The scoring models were trained on data through December 31, 2022, and fully locked as of that date.
+				The Silver Alpha simulation runs from January 2023 through March 2026 — meaning every trade shown
+				uses signals generated from a frozen model on data it had never seen during training. No hyperparameters,
+				features, or weights were modified during the simulation window.
 			</p>
 
 			<h2 id="performance" style="scroll-margin-top: 4rem;">Performance</h2>
@@ -89,6 +100,14 @@ const colNames: Record<string, string> = {
 					<span class="stat-value">{avgDays}d</span>
 					<span class="stat-label">Avg Holding Period</span>
 				</div>
+				<div class="stat-card">
+					<span class="stat-value">2.07</span>
+					<span class="stat-label">Sharpe (vs SPY 1.44)</span>
+				</div>
+				<div class="stat-card">
+					<span class="stat-value">-26.49%</span>
+					<span class="stat-label">Max Drawdown</span>
+				</div>
 			</div>
 
 			<p>
@@ -107,10 +126,39 @@ const colNames: Record<string, string> = {
 				<img src="/backtest/quintile_returns.png" alt="Quintile returns showing monotonic Q1-Q5 separation" style="max-width: 100%;" />
 			</p>
 
+			<h2 id="disclosures" style="scroll-margin-top: 4rem;">What's Not Shown</h2>
+
+			<div class="disclosure-section">
+				<p>
+					<strong>Portfolio simulation methodology.</strong> The equity curve reflects a 10-bucket portfolio:
+					up to 10 concurrent positions, each bucket independently holds either a single stock or SPY.
+					When a stock triggers a SELL signal, the bucket rotates into SPY; when a new BUY signal appears,
+					the bucket sells SPY and buys the stock. This keeps capital fully deployed at all times and
+					provides a clean benchmark-relative comparison.
+				</p>
+				<p>
+					<strong>Survivorship bias (partial).</strong> The ~900-name universe is composed of current
+					S&amp;P 500 and S&amp;P 400 MidCap members, refreshed annually at year-end. Intra-year index
+					changes are not reflected, meaning a stock added or removed mid-year could introduce minor
+					survivorship effects. I've manually removed some of the most obvious cases, but the log still
+					carries some residual bias. Future versions will use point-in-time index membership.
+				</p>
+				<p>
+					<strong>Fundamental data is point-in-time.</strong> All fundamental inputs to the scoring engine
+					use as-of-record-date values — no look-ahead bias. A trade on 2024-03-15 only sees fundamentals
+					filed before that date.
+				</p>
+				<p>
+					<strong>What's still not modeled:</strong> slippage, transaction costs, borrow costs for any
+					short exposure, and realistic market-impact assumptions. The simulation reflects signal quality
+					at execution, not a fully deployed portfolio's net returns.
+				</p>
+			</div>
+
 			<h2 id="trade-log" style="scroll-margin-top: 4rem;">Trade Log</h2>
 
 			<p>
-				Every trade is logged with full transparency. {trades.length} completed trades from January 2023 through 2025.
+				Every trade is logged with full transparency. {trades.length} completed trades from January 2023 through Q1 2026.
 				<a href="/backtest/silver_alpha_trades_2023_2025.csv" style="margin-left: 0.5rem;">Download CSV</a>
 			</p>
 
@@ -150,6 +198,27 @@ const colNames: Record<string, string> = {
 </Layout>
 <script src="../scripts/toc.ts"></script>
 <style>
+	.disclosure-section {
+		border: 1px solid #353535;
+		padding: 1.25rem 1.5rem;
+		margin: 1rem 0 1.5rem;
+		font-size: 0.925rem;
+		line-height: 1.6;
+		color: #c7c7c7;
+	}
+
+	.disclosure-section p:first-child {
+		margin-top: 0;
+	}
+
+	.disclosure-section p:last-child {
+		margin-bottom: 0;
+	}
+
+	.disclosure-section strong {
+		color: #ffffff;
+	}
+
 	.stats-grid {
 		display: grid;
 		grid-template-columns: repeat(5, 1fr);

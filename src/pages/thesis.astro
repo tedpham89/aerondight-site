@@ -58,6 +58,17 @@ const theses = files.map((file) => {
 	</div>
 	<div class="layout-grid-right" slot="right">
 		<Card>
+			<div class="disclaimer-box">
+				<strong>About these reports.</strong> These are AI-generated equity research reports produced by
+				Aerondight's Thesis engine (powered by Claude Sonnet). They combine quantitative signals,
+				fundamental data, and recent news into structured analyses that I use as one input in my own
+				investment decisions. The reports serve primarily as a sanity check on the quantitative scores
+				and as a way to surface sentiment from recent news — they carry a small weight in my final
+				decision, not a deciding one. I am currently holding positions in several of the names analyzed.
+				Nothing on this page is investment advice; these are personal research notes made public for transparency.
+			</div>
+		</Card>
+		<Card>
 			<div class="header-container">
 				<Icon type="lucide" name="file-text" width={24} height={24} class="glow-icon" />
 				<h2>Equity Research Reports</h2>
@@ -76,3 +87,16 @@ const theses = files.map((file) => {
 		</Card>
 	</div>
 </Layout>
+<style>
+	.disclaimer-box {
+		border: 1px solid #353535;
+		padding: 1.25rem 1.5rem;
+		font-size: 0.925rem;
+		line-height: 1.6;
+		color: #c7c7c7;
+	}
+
+	.disclaimer-box strong {
+		color: #ffffff;
+	}
+</style>
