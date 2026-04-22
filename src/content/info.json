@@ -13,7 +13,7 @@
 			"type": "lucide",
 			"name": "brain"
 		},
-		"text": "HMM + XGBoost regime detection"
+		"text": "Python + SQLite + Quant Modeling"
 	},
 	{
 		"id": 3,
@@ -21,6 +21,6 @@
 			"type": "lucide",
 			"name": "code"
 		},
-		"text": "Python + SQLite + Claude API"
+		"text": "Claude API + GPT API"
 	}
 ]
