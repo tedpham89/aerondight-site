@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp /c/Users/trung/Documents/ClaudeProject/aerondight-site/public/backtest/performance_summary.png /c/Users/trung/Documents/ClaudeProject/aerondight-site/src/content/assets/performance_summary.png)",
+      "Bash(cp /c/Users/trung/Documents/ClaudeProject/aerondight-site/public/backtest/quintile_returns.png /c/Users/trung/Documents/ClaudeProject/aerondight-site/src/content/assets/quintile_returns.png)",
+      "Bash(cp /c/Users/trung/Documents/ClaudeProject/aerondight-site/public/backtest/silver_alpha_equity_curve.png /c/Users/trung/Documents/ClaudeProject/aerondight-site/src/content/assets/silver_alpha_equity_curve.png)",
+      "Bash(cp /c/Users/trung/Documents/ClaudeProject/aerondight-site/public/regime/regime_timeline.png /c/Users/trung/Documents/ClaudeProject/aerondight-site/src/content/assets/regime_timeline.png)",
+      "Bash(npx astro:*)",
+      "Bash(pnpm build:*)",
+      "Bash(npm install:*)",
+      "Bash(corepack enable:*)",
+      "Bash(pnpm --version)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm preview:*)",
+      "Bash(git status:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(ls -lh /c/Users/trung/Documents/ClaudeProject/aerondight-site/*.png /c/Users/trung/Documents/ClaudeProject/aerondight-site/*.md)"
+    ]
+  }
+}

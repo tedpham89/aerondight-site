@@ -1,0 +1,199 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Card from "../components/Card.astro";
+import Icon from "../components/Icon.astro";
+---
+
+<Layout title="Contact — Aerondight Systems" description="Get in touch with Aerondight Systems." pagefindIgnore>
+	<div slot="right">
+		<Card>
+			<div class="header-container">
+				<Icon
+					type="lucide"
+					name="mail"
+					width={24}
+					height={24}
+					class="glow-icon"
+				/>
+				<h2>Contact</h2>
+			</div>
+			<p class="contact-intro">Have a question or want to discuss equity research? Send a message below.</p>
+
+			<form id="contact-form" novalidate>
+				<div class="form-field">
+					<label for="name">Name</label>
+					<input type="text" id="name" name="name" required autocomplete="name" />
+				</div>
+
+				<div class="form-field">
+					<label for="email">Email</label>
+					<input type="email" id="email" name="email" required autocomplete="email" />
+				</div>
+
+				<div class="form-field honeypot-field">
+					<label for="website">Website</label>
+					<input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+				</div>
+
+				<div class="form-field">
+					<label for="message">Message</label>
+					<textarea id="message" name="message" rows="6" required></textarea>
+				</div>
+
+				<button type="submit" id="submit-btn">Send Message</button>
+			</form>
+
+			<div id="form-status" class="form-status" role="status" aria-live="polite"></div>
+		</Card>
+	</div>
+</Layout>
+
+<script is:inline>
+	const form = document.getElementById('contact-form');
+	const submitBtn = document.getElementById('submit-btn');
+	const statusEl = document.getElementById('form-status');
+
+	form.addEventListener('submit', async (e) => {
+		e.preventDefault();
+
+		submitBtn.disabled = true;
+		submitBtn.textContent = 'Sending...';
+		statusEl.className = 'form-status';
+		statusEl.textContent = '';
+
+		const data = {
+			name: form.name.value.trim(),
+			email: form.email.value.trim(),
+			message: form.message.value.trim(),
+			website: form.website.value,
+		};
+
+		try {
+			const res = await fetch('/api/contact', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(data),
+			});
+
+			const result = await res.json();
+
+			if (res.ok && result.success) {
+				statusEl.textContent = 'Thank you! Your message has been sent.';
+				statusEl.className = 'form-status success';
+				form.reset();
+			} else {
+				statusEl.textContent = result.error || 'Something went wrong. Please try again.';
+				statusEl.className = 'form-status error';
+			}
+		} catch {
+			statusEl.textContent = 'Network error. Please try again.';
+			statusEl.className = 'form-status error';
+		}
+
+		submitBtn.disabled = false;
+		submitBtn.textContent = 'Send Message';
+	});
+</script>
+
+<style>
+	h2 {
+		margin: 0;
+	}
+
+	.header-container {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 1rem;
+		margin-bottom: 1rem;
+	}
+
+	.contact-intro {
+		margin-top: 0;
+		margin-bottom: 1.5rem;
+		color: #c7c7c7;
+	}
+
+	.form-field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		margin-bottom: 1.25rem;
+	}
+
+	label {
+		font-family: 'Geist Mono', 'Courier New', Courier, monospace;
+		font-size: 0.875rem;
+		color: #c7c7c7;
+	}
+
+	input[type="text"],
+	input[type="email"],
+	textarea {
+		background-color: #1a1a1a;
+		border: 1px solid #353535;
+		color: #ffffff;
+		padding: 0.75rem;
+		font-family: inherit;
+		font-size: 1rem;
+		width: 100%;
+		box-sizing: border-box;
+		transition: border-color 0.15s ease;
+	}
+
+	input[type="text"]:focus,
+	input[type="email"]:focus,
+	textarea:focus {
+		border-color: var(--primary);
+		outline: none;
+	}
+
+	textarea {
+		resize: vertical;
+		min-height: 120px;
+	}
+
+	.honeypot-field {
+		position: absolute;
+		left: -9999px;
+		height: 0;
+		overflow: hidden;
+	}
+
+	button[type="submit"] {
+		background-color: var(--primary);
+		color: #ffffff;
+		border: 1px solid var(--primary);
+		padding: 0.75rem 1.5rem;
+		font-family: 'Geist Mono', 'Courier New', Courier, monospace;
+		font-size: 1rem;
+		cursor: pointer;
+		transition: background-color 0.15s ease, opacity 0.15s ease;
+	}
+
+	button[type="submit"]:hover {
+		background-color: #7a4ae0;
+	}
+
+	button[type="submit"]:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.form-status {
+		margin-top: 1rem;
+		font-size: 0.925rem;
+	}
+
+	.form-status:empty {
+		display: none;
+	}
+
+	.form-status.success {
+		color: #4ade80;
+	}
+
+	.form-status.error {
+		color: #f87171;
+	}
+</style>

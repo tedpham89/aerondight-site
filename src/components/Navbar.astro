@@ -28,6 +28,10 @@ const path = Astro.url.pathname;
     </li>
     <li class="nav-separator">/</li>
     <li>
+      <a href="/contact" class:list={{ active: path.startsWith('/contact') }}>Contact</a>
+    </li>
+    <li class="nav-separator">/</li>
+    <li>
       <input id="search" type="text" placeholder="Search (Ctrl+K)" />
       <div id="search-results"></div>
     </li>
