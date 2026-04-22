@@ -8,11 +8,23 @@ const path = Astro.url.pathname;
   <a class="site-title" href="/">{name}</a>
   <ul>
     <li>
-      <a href="/blog" class:list={{ active: path.startsWith('/blog') }}>Blog</a>
+      <a href="/" class:list={{ active: path === '/' }}>Home</a>
     </li>
     <li class="nav-separator">/</li>
     <li>
-      <a href="/projects" class:list={{ active: path.startsWith('/projects') }}>Projects</a>
+      <a href="/regime" class:list={{ active: path.startsWith('/regime') }}>Regime</a>
+    </li>
+    <li class="nav-separator">/</li>
+    <li>
+      <a href="/silver-alpha" class:list={{ active: path.startsWith('/silver-alpha') }}>Silver Alpha</a>
+    </li>
+    <li class="nav-separator">/</li>
+    <li>
+      <a href="/thesis" class:list={{ active: path.startsWith('/thesis') }}>Thesis</a>
+    </li>
+    <li class="nav-separator">/</li>
+    <li>
+      <a href="/research" class:list={{ active: path.startsWith('/research') }}>Research</a>
     </li>
     <li class="nav-separator">/</li>
     <li>

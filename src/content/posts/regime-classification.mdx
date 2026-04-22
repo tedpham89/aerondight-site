@@ -1,0 +1,42 @@
+---
+title: "Market Regime Classification with HMM and XGBoost"
+description: "How Aerondight detects four distinct market regimes and uses them to modulate stock scoring."
+image: "../assets/regime_timeline.png"
+createdAt: 03-15-2023
+draft: false
+tags:
+  - regime
+  - methodology
+---
+
+Markets don't behave the same way all the time. A momentum strategy that prints money in a tech rally will get destroyed in a crisis. Aerondight's regime classifier exists to answer one question: **what kind of market are we in right now?**
+
+## The Four Regimes
+
+### Bull Broad
+The real economy is rallying with broad market participation. Cyclical sectors outperform, breadth is strong, and volatility is low. This is the classic risk-on environment where most stocks participate in the uptrend.
+
+### Bull Tech
+A tech-led, narrow rally. Large-cap technology drives returns while breadth is weaker. VIX remains low, but leadership is concentrated. Momentum strategies work well, but the narrow base creates fragility.
+
+### Correction
+A grinding bear market with elevated volatility (~24 VIX). Breadth deteriorates, spreads widen, and defensive sectors begin to outperform. This regime can persist for months and often precedes either recovery or deeper crisis.
+
+### Crisis
+A sharp, violent crash with extreme volatility (~45 VIX). This is rare (~6% of historical time) but devastating. Correlations spike toward 1.0, and traditional diversification fails. These episodes are short-lived but create the best long-term buying opportunities for patient investors.
+
+## How It Works
+
+The system uses two independent models:
+
+**Hidden Markov Model (HMM)** — learns the statistical properties of each regime from historical macro data. It identifies clusters of similar market behavior without being told what to look for. State labels are assigned automatically after training based on the return and risk characteristics of each cluster.
+
+**XGBoost Validator** — independently predicts the regime using a broader feature set. When both models agree, the system has higher confidence in the current classification.
+
+## Why It Matters
+
+The regime classification feeds directly into the scoring engine. The same stock can receive different scores depending on the current regime. A defensive utility name might score higher in a correction than in a broad bull rally, even if its fundamentals haven't changed.
+
+This is the key insight: **context-aware scoring beats static scoring**. The regime classifier provides that context.
+
+![Regime timeline showing SPY price with color-coded regime backgrounds](/regime/regime_timeline.png)

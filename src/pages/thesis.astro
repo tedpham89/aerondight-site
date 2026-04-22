@@ -1,0 +1,78 @@
+---
+import "../styles/article-list.css";
+
+import fs from "node:fs";
+import path from "node:path";
+import Card from "../components/Card.astro";
+import Icon from "../components/Icon.astro";
+import Layout from "../layouts/Layout.astro";
+
+// Read thesis PDFs from public/thesis/
+const thesisDir = path.join(process.cwd(), "public/thesis");
+const files = fs.readdirSync(thesisDir).filter((f) => f.endsWith(".pdf")).sort().reverse();
+
+// Ticker to company name mapping
+const companyNames: Record<string, string> = {
+	ENS: "Ensign Group",
+	FIX: "Comfort Systems USA",
+	IBKR: "Interactive Brokers",
+	JLL: "Jones Lang LaSalle",
+	MU: "Micron Technology",
+	PRI: "Primerica",
+};
+
+// Parse filename: public_TICKER_YYYY-MM-DD.pdf
+const theses = files.map((file) => {
+	const match = file.match(/^public_([A-Z]+)_(\d{4}-\d{2}-\d{2})\.pdf$/);
+	if (!match) return null;
+	const [, ticker, dateStr] = match;
+	const date = new Date(dateStr);
+	const slug = `${ticker.toLowerCase()}-${dateStr}`;
+	return {
+		file,
+		ticker,
+		company: companyNames[ticker] || ticker,
+		date,
+		dateStr,
+		slug,
+	};
+}).filter(Boolean) as { file: string; ticker: string; company: string; date: Date; dateStr: string; slug: string }[];
+---
+
+<Layout
+	title="Thesis"
+	description="AI-generated institutional-quality equity research reports from Aerondight Systems."
+	pagefindIgnore
+>
+	<div class="layout-grid-left" slot="left">
+		<Card class="flex-col-card">
+			<h2 class="no-mt">About</h2>
+			<p style="margin: 0; font-size: 0.925rem; color: #c7c7c7; line-height: 1.6;">
+				AI-generated equity research using Claude API. Each report combines quantitative signals,
+				fundamental data, and recent news into a professional 7-section analysis.
+			</p>
+			<p style="margin-top: 0.75rem; margin-bottom: 0; font-size: 0.825rem; color: #808080;">
+				Cost per report: ~$0.005
+			</p>
+		</Card>
+	</div>
+	<div class="layout-grid-right" slot="right">
+		<Card>
+			<div class="header-container">
+				<Icon type="lucide" name="file-text" width={24} height={24} class="glow-icon" />
+				<h2>Equity Research Reports</h2>
+			</div>
+			<div class="content-container">
+				{theses.map((t) => (
+					<a href={`/thesis/${t.slug}`} class="post-container">
+						<div class="post-header">
+							<h3>{t.ticker} — {t.company}</h3>
+							<span class="post-date">{t.date.toLocaleDateString()}</span>
+						</div>
+						<span>AI-generated institutional-quality equity research report for {t.company} ({t.ticker}).</span>
+					</a>
+				))}
+			</div>
+		</Card>
+	</div>
+</Layout>

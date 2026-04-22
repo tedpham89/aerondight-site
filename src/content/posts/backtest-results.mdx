@@ -1,0 +1,46 @@
+---
+title: "Out-of-Sample Backtest: Silver Alpha Performance"
+description: "135 trades, 59% win rate, and monotonic quintile separation — the numbers behind Silver Alpha's 2023-2025 track record."
+image: "../assets/silver_alpha_equity_curve.png"
+createdAt: 02-01-2026
+draft: false
+tags:
+  - backtest
+  - research
+---
+
+Theory is cheap. The only thing that matters is whether the system works on data it has never seen. Here are the out-of-sample results.
+
+## Signal Quality: Quintile Returns (2020-2026)
+
+The most important test for any scoring system: do higher-scored stocks actually outperform lower-scored ones?
+
+Aerondight's scores produce **monotonic quintile separation** — Q1 (top-scored) stocks consistently outperform Q2, which outperforms Q3, and so on down to Q5. This holds across both the swing trade and long-term models on fully out-of-sample data from 2020 to 2026.
+
+![Quintile return chart showing monotonic Q1-Q5 separation](/backtest/quintile_returns.png)
+
+Monotonic separation is the gold standard for factor-based systems. It means the scoring engine isn't just picking winners — it's correctly *ranking* the entire universe.
+
+## Silver Alpha: Live Simulation (2023-2025)
+
+Silver Alpha is a swing trade strategy that uses the scoring engine's signals for entry and exit. It ran as a paper simulation from January 2023 through 2025.
+
+**Key stats:**
+- **135 completed trades**
+- **59.3% win rate**
+- **15.25% average return per trade**
+- Fully systematic — no discretionary overrides
+
+![Silver Alpha equity curve vs SPY buy-and-hold](/backtest/silver_alpha_equity_curve.png)
+
+The full trade log (all 135 trades with entry/exit dates, prices, returns, and exit reasons) is available for download: [silver_alpha_trades_2023_2025.csv](/backtest/silver_alpha_trades_2023_2025.csv).
+
+## Performance Summary
+
+![Performance summary card with signal quality and portfolio statistics](/backtest/performance_summary.png)
+
+## What's Not Shown
+
+These results reflect the scoring engine and signal generation — not a fully deployed portfolio with position sizing, slippage, or transaction costs. The purpose is to demonstrate that the signals themselves have predictive power. Turning signals into a live portfolio is a separate (and important) problem.
+
+The trade log is fully transparent: every entry, every exit, every reason. No cherry-picking.

@@ -3,17 +3,24 @@
 		"id": 1,
 		"icon": {
 			"type": "lucide",
-			"name": "cake"
+			"name": "bar-chart-3"
 		},
-		"text": "1 year old"
+		"text": "~900 stocks scored daily"
 	},
 	{
 		"id": 2,
 		"icon": {
 			"type": "lucide",
-			"name": "earth"
+			"name": "brain"
 		},
-		"type": "lucide",
-		"text": "Made in Germany"
+		"text": "HMM + XGBoost regime detection"
+	},
+	{
+		"id": 3,
+		"icon": {
+			"type": "lucide",
+			"name": "code"
+		},
+		"text": "Python + SQLite + Claude API"
 	}
 ]

@@ -1,0 +1,205 @@
+---
+import "../styles/article.css";
+
+import Card from "../components/Card.astro";
+import Icon from "../components/Icon.astro";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+	title="Market Regime Classification"
+	description="How Aerondight detects four distinct market regimes using HMM and XGBoost to modulate equity scoring."
+>
+	<div class="left" slot="left">
+		<Card class="toc-card">
+			<h2 class="no-mt">On this page</h2>
+			<ol>
+				<li class="toc-li"><a href="#_top" class="active">Overview</a></li>
+				<li class="toc-li"><a href="#the-four-regimes">The Four Regimes</a></li>
+				<li class="toc-li"><a href="#how-it-works">How It Works</a></li>
+				<li class="toc-li"><a href="#regime-timeline">Regime Timeline</a></li>
+				<li class="toc-li"><a href="#impact-on-scoring">Impact on Scoring</a></li>
+			</ol>
+		</Card>
+	</div>
+	<article slot="right" data-pagefind-body>
+		<Card>
+			<h1 class="no-mt" id="_top" style="scroll-margin-top: 2rem;">Market Regime Classification</h1>
+			<p style="color: #c7c7c7; margin-top: 0.5rem;">
+				The first layer of Aerondight's scoring pipeline — detecting what kind of market we're in.
+			</p>
+
+			<p>
+				Markets don't behave the same way all the time. A momentum strategy that prints money in a tech rally
+				will get destroyed in a crisis. The regime classifier exists to answer one question:
+				<strong>what kind of market are we in right now?</strong>
+			</p>
+
+			<h2 id="the-four-regimes" style="scroll-margin-top: 4rem;">The Four Regimes</h2>
+
+			<div class="regime-grid">
+				<div class="regime-card">
+					<div class="regime-header bull-broad">
+						<Icon type="lucide" name="trending-up" width={20} height={20} />
+						<h3 class="no-mt">Bull Broad</h3>
+					</div>
+					<p>
+						The real economy is rallying with broad market participation. Cyclical sectors outperform,
+						breadth is strong, and volatility is low. This is the classic risk-on environment where most
+						stocks participate in the uptrend.
+					</p>
+				</div>
+
+				<div class="regime-card">
+					<div class="regime-header bull-tech">
+						<Icon type="lucide" name="cpu" width={20} height={20} />
+						<h3 class="no-mt">Bull Tech</h3>
+					</div>
+					<p>
+						A tech-led, narrow rally. Large-cap technology drives returns while breadth is weaker. VIX
+						remains low, but leadership is concentrated. Momentum strategies work well, but the narrow
+						base creates fragility.
+					</p>
+				</div>
+
+				<div class="regime-card">
+					<div class="regime-header correction">
+						<Icon type="lucide" name="trending-down" width={20} height={20} />
+						<h3 class="no-mt">Correction</h3>
+					</div>
+					<p>
+						A grinding bear market with elevated volatility (~24 VIX). Breadth deteriorates, spreads widen,
+						and defensive sectors begin to outperform. This regime can persist for months and often precedes
+						either recovery or deeper crisis.
+					</p>
+				</div>
+
+				<div class="regime-card">
+					<div class="regime-header crisis">
+						<Icon type="lucide" name="alert-triangle" width={20} height={20} />
+						<h3 class="no-mt">Crisis</h3>
+					</div>
+					<p>
+						A sharp, violent crash with extreme volatility (~45 VIX). Rare (~6% of historical time)
+						but devastating. Correlations spike toward 1.0. These episodes are short-lived but create
+						the best long-term buying opportunities.
+					</p>
+				</div>
+			</div>
+
+			<h2 id="how-it-works" style="scroll-margin-top: 4rem;">How It Works</h2>
+
+			<p>The system uses two independent models for robust classification:</p>
+
+			<div class="model-row">
+				<div class="model-box">
+					<h3 class="no-mt">Hidden Markov Model</h3>
+					<p>
+						Learns the statistical properties of each regime from historical macro data. It identifies
+						clusters of similar market behavior without being told what to look for. State labels are
+						assigned automatically after training based on return and risk characteristics.
+					</p>
+				</div>
+				<div class="model-box">
+					<h3 class="no-mt">XGBoost Validator</h3>
+					<p>
+						Independently predicts the regime using a broader feature set. When both models agree,
+						the system has higher confidence in the current classification. When they disagree,
+						the system becomes more conservative.
+					</p>
+				</div>
+			</div>
+
+			<h2 id="regime-timeline" style="scroll-margin-top: 4rem;">Regime Timeline</h2>
+
+			<p>SPY price history with color-coded regime backgrounds (smoothed):</p>
+
+			<p>
+				<img src="/regime/regime_timeline.png" alt="Regime timeline showing SPY price with color-coded regime backgrounds" style="max-width: 100%;" />
+			</p>
+
+			<h2 id="impact-on-scoring" style="scroll-margin-top: 4rem;">Impact on Scoring</h2>
+
+			<p>
+				The regime classification feeds directly into the scoring engine. The same stock can receive different
+				scores depending on the current regime. A defensive utility name might score higher in a correction
+				than in a broad bull rally, even if its fundamentals haven't changed.
+			</p>
+
+			<p>
+				This is the key insight: <strong>context-aware scoring beats static scoring</strong>. The regime
+				classifier provides that context.
+			</p>
+		</Card>
+	</article>
+</Layout>
+<script src="../scripts/toc.ts"></script>
+<style>
+	.regime-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+		margin-top: 1rem;
+	}
+
+	@media screen and (max-width: 640px) {
+		.regime-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.regime-card {
+		border: 1px solid #353535;
+		padding: 1rem;
+	}
+
+	.regime-card p {
+		margin-bottom: 0;
+		font-size: 0.925rem;
+		color: #c7c7c7;
+		line-height: 1.6;
+	}
+
+	.regime-header {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 0.75rem;
+		padding-bottom: 0.5rem;
+		border-bottom: 2px solid;
+	}
+
+	.regime-header h3 {
+		margin-bottom: 0;
+	}
+
+	.bull-broad { border-color: #16c79a; color: #16c79a; }
+	.bull-tech { border-color: #8c5cf5; color: #8c5cf5; }
+	.correction { border-color: #e94560; color: #e94560; }
+	.crisis { border-color: #ff6b6b; color: #ff6b6b; }
+
+	.model-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+		margin-top: 1rem;
+	}
+
+	@media screen and (max-width: 640px) {
+		.model-row {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.model-box {
+		border: 1px solid #353535;
+		padding: 1rem;
+	}
+
+	.model-box p {
+		margin-bottom: 0;
+		font-size: 0.925rem;
+		color: #c7c7c7;
+		line-height: 1.6;
+	}
+</style>

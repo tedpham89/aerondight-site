@@ -1,0 +1,231 @@
+---
+import "../styles/article.css";
+
+import fs from "node:fs";
+import path from "node:path";
+import Card from "../components/Card.astro";
+import Icon from "../components/Icon.astro";
+import Layout from "../layouts/Layout.astro";
+
+// Read and parse the trade log CSV at build time
+const csvPath = path.join(process.cwd(), "public/backtest/silver_alpha_trades_2023_2025.csv");
+const csvRaw = fs.readFileSync(csvPath, "utf-8");
+const lines = csvRaw.trim().split("\n");
+const headers = lines[0].split(",");
+const trades = lines.slice(1).map((line) => line.split(","));
+
+// Compute stats
+const returns = trades.map((t) => parseFloat(t[5]));
+const wins = returns.filter((r) => r > 0).length;
+const winRate = ((wins / returns.length) * 100).toFixed(1);
+const avgReturn = (returns.reduce((a, b) => a + b, 0) / returns.length).toFixed(2);
+const excessReturns = trades.map((t) => parseFloat(t[7]));
+const avgExcess = (excessReturns.reduce((a, b) => a + b, 0) / excessReturns.length).toFixed(2);
+const avgDays = Math.round(trades.reduce((a, t) => a + parseInt(t[8]), 0) / trades.length);
+
+// Column display names
+const colNames: Record<string, string> = {
+	symbol: "Symbol",
+	entry_date: "Entry",
+	exit_date: "Exit",
+	entry_price: "Entry $",
+	exit_price: "Exit $",
+	return_pct: "Return %",
+	spy_return_pct: "SPY %",
+	excess_pct: "Excess %",
+	days_held: "Days",
+	exit_reason: "Exit Reason",
+};
+---
+
+<Layout
+	title="Silver Alpha Strategy"
+	description="Systematic swing trade strategy: 135 trades, 59% win rate, full trade log transparency."
+>
+	<div class="left" slot="left">
+		<Card class="toc-card">
+			<h2 class="no-mt">On this page</h2>
+			<ol>
+				<li class="toc-li"><a href="#_top" class="active">Overview</a></li>
+				<li class="toc-li"><a href="#performance">Performance</a></li>
+				<li class="toc-li"><a href="#equity-curve">Equity Curve</a></li>
+				<li class="toc-li"><a href="#trade-log">Trade Log</a></li>
+			</ol>
+		</Card>
+	</div>
+	<article slot="right" data-pagefind-body>
+		<Card>
+			<h1 class="no-mt" id="_top" style="scroll-margin-top: 2rem;">Silver Alpha Strategy</h1>
+			<p style="color: #c7c7c7; margin-top: 0.5rem;">
+				Systematic swing trade strategy — 2023 to 2025 out-of-sample simulation.
+			</p>
+
+			<p>
+				Silver Alpha is a swing trade strategy built on Aerondight's multi-factor scoring engine.
+				It uses conviction scores and signal transitions to systematically enter and exit positions
+				in US equities. All decisions are fully systematic — no discretionary overrides.
+			</p>
+
+			<h2 id="performance" style="scroll-margin-top: 4rem;">Performance</h2>
+
+			<div class="stats-grid">
+				<div class="stat-card">
+					<span class="stat-value">{trades.length}</span>
+					<span class="stat-label">Total Trades</span>
+				</div>
+				<div class="stat-card">
+					<span class="stat-value">{winRate}%</span>
+					<span class="stat-label">Win Rate</span>
+				</div>
+				<div class="stat-card">
+					<span class="stat-value">{avgReturn}%</span>
+					<span class="stat-label">Avg Return</span>
+				</div>
+				<div class="stat-card">
+					<span class="stat-value">{avgExcess}%</span>
+					<span class="stat-label">Avg Excess vs SPY</span>
+				</div>
+				<div class="stat-card">
+					<span class="stat-value">{avgDays}d</span>
+					<span class="stat-label">Avg Holding Period</span>
+				</div>
+			</div>
+
+			<p>
+				<img src="/backtest/performance_summary.png" alt="Performance summary with signal quality and portfolio statistics" style="max-width: 100%;" />
+			</p>
+
+			<h2 id="equity-curve" style="scroll-margin-top: 4rem;">Equity Curve</h2>
+
+			<p>Silver Alpha vs SPY buy-and-hold over the simulation period:</p>
+
+			<p>
+				<img src="/backtest/silver_alpha_equity_curve.png" alt="Silver Alpha equity curve vs SPY" style="max-width: 100%;" />
+			</p>
+
+			<p>
+				<img src="/backtest/quintile_returns.png" alt="Quintile returns showing monotonic Q1-Q5 separation" style="max-width: 100%;" />
+			</p>
+
+			<h2 id="trade-log" style="scroll-margin-top: 4rem;">Trade Log</h2>
+
+			<p>
+				Every trade is logged with full transparency. {trades.length} completed trades from January 2023 through 2025.
+				<a href="/backtest/silver_alpha_trades_2023_2025.csv" style="margin-left: 0.5rem;">Download CSV</a>
+			</p>
+
+			<div class="table-wrapper">
+				<table>
+					<thead>
+						<tr>
+							{headers.map((h) => <th>{colNames[h] || h}</th>)}
+						</tr>
+					</thead>
+					<tbody>
+						{trades.map((row) => (
+							<tr>
+								{row.map((cell, i) => (
+									<td class:list={{
+										positive: headers[i] === "return_pct" && parseFloat(cell) > 0,
+										negative: headers[i] === "return_pct" && parseFloat(cell) < 0,
+										"excess-positive": headers[i] === "excess_pct" && parseFloat(cell) > 0,
+										"excess-negative": headers[i] === "excess_pct" && parseFloat(cell) < 0,
+									}}>
+										{headers[i] === "return_pct" || headers[i] === "spy_return_pct" || headers[i] === "excess_pct"
+											? `${parseFloat(cell).toFixed(2)}%`
+											: headers[i] === "entry_price" || headers[i] === "exit_price"
+												? `$${parseFloat(cell).toFixed(2)}`
+												: headers[i] === "symbol"
+													? cell.replace(".US", "")
+													: cell}
+									</td>
+								))}
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+		</Card>
+	</article>
+</Layout>
+<script src="../scripts/toc.ts"></script>
+<style>
+	.stats-grid {
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);
+		gap: 1rem;
+		margin: 1.5rem 0;
+	}
+
+	@media screen and (max-width: 900px) {
+		.stats-grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+
+	@media screen and (max-width: 640px) {
+		.stats-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	.stat-card {
+		border: 1px solid #353535;
+		padding: 1rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+
+	.stat-value {
+		font-size: 1.5em;
+		font-weight: 700;
+		font-family: 'Geist Mono', 'Courier New', Courier, monospace;
+		color: var(--primary-light);
+	}
+
+	.stat-label {
+		font-size: 0.8rem;
+		color: #c7c7c7;
+		margin-top: 0.25rem;
+	}
+
+	.table-wrapper {
+		overflow-x: auto;
+		margin-top: 1rem;
+		border: 1px solid #353535;
+	}
+
+	.table-wrapper table {
+		margin: 0;
+		width: 100%;
+		font-size: 0.825rem;
+		font-family: 'Geist Mono', 'Courier New', Courier, monospace;
+		white-space: nowrap;
+	}
+
+	.table-wrapper th {
+		background: #1a1a1a;
+		padding: 0.5rem 0.75rem;
+		font-size: 0.75rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: #c7c7c7;
+		position: sticky;
+		top: 0;
+	}
+
+	.table-wrapper td {
+		padding: 0.4rem 0.75rem;
+	}
+
+	.table-wrapper tbody tr:hover {
+		background: rgba(140, 92, 245, 0.08);
+	}
+
+	.positive { color: #16c79a; }
+	.negative { color: #e94560; }
+	.excess-positive { color: #16c79a; }
+	.excess-negative { color: #e94560; }
+</style>

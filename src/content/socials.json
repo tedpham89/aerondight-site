@@ -3,9 +3,9 @@
 		"id": 1,
 		"icon": {
 			"type": "lucide",
-			"name": "github"
+			"name": "globe"
 		},
-		"text": "GitHub",
-		"link": "https://github.com/louisescher/spectre"
+		"text": "aerondight.systems",
+		"link": "https://aerondight.systems"
 	}
 ]

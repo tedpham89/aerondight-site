@@ -1,0 +1,173 @@
+---
+import "../../styles/article.css";
+
+import fs from "node:fs";
+import path from "node:path";
+import type { GetStaticPaths } from "astro";
+import Card from "../../components/Card.astro";
+import Icon from "../../components/Icon.astro";
+import Layout from "../../layouts/Layout.astro";
+
+export const getStaticPaths = (() => {
+	const names: Record<string, string> = {
+		ENS: "Ensign Group",
+		FIX: "Comfort Systems USA",
+		IBKR: "Interactive Brokers",
+		JLL: "Jones Lang LaSalle",
+		MU: "Micron Technology",
+		PRI: "Primerica",
+	};
+
+	const thesisDir = path.join(process.cwd(), "public/thesis");
+	const files = fs.readdirSync(thesisDir).filter((f) => f.endsWith(".pdf"));
+
+	return files.map((file) => {
+		const match = file.match(/^public_([A-Z]+)_(\d{4}-\d{2}-\d{2})\.pdf$/);
+		if (!match) return null;
+		const [, ticker, dateStr] = match;
+		const slug = `${ticker.toLowerCase()}-${dateStr}`;
+		return {
+			params: { thesis: slug },
+			props: {
+				file,
+				ticker,
+				company: names[ticker] || ticker,
+				date: new Date(dateStr),
+				dateStr,
+			},
+		};
+	}).filter(Boolean);
+}) satisfies GetStaticPaths;
+
+const { file, ticker, company, date, dateStr } = Astro.props;
+const pdfUrl = `/thesis/${file}`;
+---
+
+<Layout
+	title={`${ticker} — ${company} | Thesis`}
+	description={`AI-generated equity research report for ${company} (${ticker}), ${dateStr}.`}
+>
+	<div class="left" slot="left">
+		<Card class="toc-card">
+			<h2 class="no-mt">Report Info</h2>
+			<ul class="report-info">
+				<li>
+					<Icon type="lucide" name="building-2" width={16} height={16} />
+					<span>{company}</span>
+				</li>
+				<li>
+					<Icon type="lucide" name="tag" width={16} height={16} />
+					<span>{ticker}</span>
+				</li>
+				<li>
+					<Icon type="lucide" name="calendar" width={16} height={16} />
+					<span>{date.toLocaleDateString()}</span>
+				</li>
+				<li>
+					<Icon type="lucide" name="bot" width={16} height={16} />
+					<span>Claude API (Sonnet)</span>
+				</li>
+			</ul>
+			<a href={pdfUrl} download class="download-link">
+				<Icon type="lucide" name="download" width={16} height={16} />
+				<span>Download PDF</span>
+			</a>
+		</Card>
+	</div>
+	<article slot="right" data-pagefind-body>
+		<Card>
+			<div class="thesis-header" data-pagefind-ignore>
+				<h1 class="no-mt">{ticker} — {company}</h1>
+				<p style="color: #c7c7c7; margin-top: 0.25rem;">
+					Equity research report · {date.toLocaleDateString()}
+				</p>
+			</div>
+			<div class="pdf-container">
+				<iframe
+					src={pdfUrl}
+					title={`${ticker} ${company} equity research report`}
+					width="100%"
+					height="100%"
+				></iframe>
+			</div>
+			<hr class="end-of-article" />
+			<a href="/thesis" class="block-link" data-pagefind-ignore>← Back to thesis</a>
+		</Card>
+	</article>
+</Layout>
+<style>
+	.report-info {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.report-info li {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.925rem;
+		color: #c7c7c7;
+	}
+
+	.download-link {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-top: 1.25rem;
+		padding: 0.5rem 0.75rem;
+		background: var(--primary);
+		color: white;
+		text-decoration: none;
+		font-size: 0.875rem;
+		width: fit-content;
+	}
+
+	.download-link:hover {
+		opacity: 0.9;
+		color: white;
+	}
+
+	.pdf-container {
+		width: 100%;
+		height: 80vh;
+		min-height: 600px;
+		border: 1px solid #353535;
+		margin-top: 1rem;
+	}
+
+	.pdf-container iframe {
+		border: none;
+		display: block;
+	}
+
+	.thesis-header {
+		margin-bottom: 0;
+	}
+</style>
+<style is:global>
+	.left {
+		height: 100%;
+		position: relative;
+	}
+
+	.toc-card {
+		position: sticky;
+		top: 2rem;
+	}
+
+	article {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+	}
+
+	@media screen and (max-width: 640px) {
+		article {
+			gap: 1rem;
+		}
+	}
+</style>

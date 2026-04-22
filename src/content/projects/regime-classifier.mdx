@@ -1,0 +1,46 @@
+---
+title: Regime Classifier
+date: 03-15-2026
+description: HMM + XGBoost system that detects four distinct market regimes to modulate equity scoring in real time.
+image: ../assets/regime_timeline.png
+info:
+  - text: 4 market regimes
+    icon:
+      type: lucide
+      name: layers
+  - text: HMM + XGBoost
+    icon:
+      type: lucide
+      name: brain
+  - text: Daily updates
+    icon:
+      type: lucide
+      name: refresh-cw
+---
+
+The Regime Classifier is the first layer of Aerondight's scoring pipeline. It answers a simple but critical question: **what kind of market are we in right now?**
+
+## Four Distinct States
+
+The system classifies the market into one of four regimes:
+
+| Regime | Character | Typical VIX |
+|--------|-----------|-------------|
+| **Bull Broad** | Real economy rally, broad participation | Low |
+| **Bull Tech** | Tech-led narrow rally, weak breadth | Low |
+| **Correction** | Grinding bear, defensive outperformance | ~24 |
+| **Crisis** | Sharp crash, correlations spike | ~45 |
+
+## Dual-Model Validation
+
+A **Hidden Markov Model** identifies regime clusters from historical macro data — it finds patterns without being told what to look for. An independent **XGBoost classifier** validates the HMM's output using a broader feature set.
+
+When both models agree, signal confidence increases. When they disagree, the system becomes more conservative.
+
+## Impact on Scoring
+
+The regime classification feeds directly into the stock scoring engine. The same stock can receive different scores depending on the current market regime. This context-awareness is what separates Aerondight from static factor models.
+
+![Regime timeline showing SPY price with color-coded backgrounds](/regime/regime_timeline.png)
+
+Crisis regimes are rare (~6% of historical time) but are where the long-term model finds its best opportunities — patient capital deployed during panic historically produces outsized returns.

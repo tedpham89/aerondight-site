@@ -1,0 +1,54 @@
+---
+title: Silver Alpha Strategy
+date: 04-15-2026
+description: Systematic swing trade strategy with 135 trades, 59% win rate, and full trade log transparency over 2023-2025.
+image: ../assets/silver_alpha_equity_curve.png
+info:
+  - text: 135 trades
+    icon:
+      type: lucide
+      name: trending-up
+  - text: 59% win rate
+    icon:
+      type: lucide
+      name: target
+  - text: 2023-2025 OOS
+    icon:
+      type: lucide
+      name: calendar
+  - text: Trade Log CSV
+    link: https://aerondight.systems/backtest/silver_alpha_trades_2023_2025.csv
+    icon:
+      type: lucide
+      name: download
+---
+
+Silver Alpha is a swing trade strategy built on top of Aerondight's multi-factor scoring engine. It uses conviction scores and signal transitions to systematically enter and exit positions in US equities.
+
+## How It Works
+
+The strategy monitors the entire ~900 stock universe for signal transitions. When a stock's score crosses the entry threshold and both the swing trade and long-term models agree, a position is opened. Exits are triggered by score deterioration, time-based stops, or regime shifts.
+
+All decisions are fully systematic — no discretionary overrides.
+
+## Performance (2023-2025 Out-of-Sample)
+
+The strategy was run as a paper simulation from January 2023 through 2025, producing 135 completed trades:
+
+- **59.3% win rate** across all trades
+- **15.25% average return** per trade
+- Exits driven by score deterioration, not arbitrary stop-losses
+
+![Silver Alpha equity curve vs SPY](/backtest/silver_alpha_equity_curve.png)
+
+## Full Transparency
+
+Every trade is logged with entry date, exit date, entry price, exit price, return, SPY return over the same period, excess return, days held, and exit reason.
+
+The complete trade log is available for download: [silver_alpha_trades_2023_2025.csv](/backtest/silver_alpha_trades_2023_2025.csv)
+
+![Performance summary](/backtest/performance_summary.png)
+
+## What's Next
+
+The next step is live execution with real capital. The scoring engine runs daily in production — the infrastructure for live trading is already in place. Publishing this track record is the first step toward building a verifiable public record.

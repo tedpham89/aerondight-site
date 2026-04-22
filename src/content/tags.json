@@ -1,5 +1,14 @@
 [
 	{
-		"id": "guide"
+		"id": "methodology"
+	},
+	{
+		"id": "backtest"
+	},
+	{
+		"id": "regime"
+	},
+	{
+		"id": "research"
 	}
 ]
