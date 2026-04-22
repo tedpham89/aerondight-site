@@ -4,6 +4,8 @@ import Card from "../components/Card.astro";
 import Icon from "../components/Icon.astro";
 ---
 
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
 <Layout title="Contact — Aerondight Systems" description="Get in touch with Aerondight Systems." pagefindIgnore>
 	<div slot="right">
 		<Card>
@@ -40,7 +42,9 @@ import Icon from "../components/Icon.astro";
 					<textarea id="message" name="message" rows="6" required></textarea>
 				</div>
 
-				<button type="submit" id="submit-btn">Send Message</button>
+				<div class="cf-turnstile" data-sitekey="0x4AAAAAADBSiakyrdPf83EX" data-theme="dark"></div>
+
+			<button type="submit" id="submit-btn">Send Message</button>
 			</form>
 
 			<div id="form-status" class="form-status" role="status" aria-live="polite"></div>
@@ -61,11 +65,23 @@ import Icon from "../components/Icon.astro";
 		statusEl.className = 'form-status';
 		statusEl.textContent = '';
 
+		const turnstileResponse = form.querySelector('[name="cf-turnstile-response"]');
+		const turnstileToken = turnstileResponse ? turnstileResponse.value : '';
+
+		if (!turnstileToken) {
+			statusEl.textContent = 'Please complete the verification.';
+			statusEl.className = 'form-status error';
+			submitBtn.disabled = false;
+			submitBtn.textContent = 'Send Message';
+			return;
+		}
+
 		const data = {
 			name: form.name.value.trim(),
 			email: form.email.value.trim(),
 			message: form.message.value.trim(),
 			website: form.website.value,
+			turnstileToken,
 		};
 
 		try {
@@ -81,6 +97,7 @@ import Icon from "../components/Icon.astro";
 				statusEl.textContent = 'Thank you! Your message has been sent.';
 				statusEl.className = 'form-status success';
 				form.reset();
+				if (window.turnstile) turnstile.reset();
 			} else {
 				statusEl.textContent = result.error || 'Something went wrong. Please try again.';
 				statusEl.className = 'form-status error';
@@ -158,6 +175,10 @@ import Icon from "../components/Icon.astro";
 		left: -9999px;
 		height: 0;
 		overflow: hidden;
+	}
+
+	.cf-turnstile {
+		margin-bottom: 1.25rem;
 	}
 
 	button[type="submit"] {

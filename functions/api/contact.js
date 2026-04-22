@@ -1,6 +1,6 @@
 export async function onRequestPost({ request, env }) {
 	try {
-		const { name, email, message, website } = await request.json();
+		const { name, email, message, website, turnstileToken } = await request.json();
 
 		// Validate required fields
 		if (
@@ -18,6 +18,34 @@ export async function onRequestPost({ request, env }) {
 		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
 			return Response.json(
 				{ success: false, error: "Please provide a valid email address." },
+				{ status: 400 }
+			);
+		}
+
+		// Verify Turnstile token
+		if (!turnstileToken) {
+			return Response.json(
+				{ success: false, error: "Verification token is missing." },
+				{ status: 400 }
+			);
+		}
+
+		const turnstileRes = await fetch(
+			"https://challenges.cloudflare.com/turnstile/v0/siteverify",
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/x-www-form-urlencoded" },
+				body: new URLSearchParams({
+					secret: env.TURNSTILE_SECRET_KEY,
+					response: turnstileToken,
+				}),
+			}
+		);
+
+		const turnstileData = await turnstileRes.json();
+		if (!turnstileData.success) {
+			return Response.json(
+				{ success: false, error: "Verification failed. Please try again." },
 				{ status: 400 }
 			);
 		}
