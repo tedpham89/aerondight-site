@@ -9,7 +9,7 @@ import Layout from "../layouts/Layout.astro";
 
 // Read thesis PDFs from public/thesis/
 const thesisDir = path.join(process.cwd(), "public/thesis");
-const files = fs.readdirSync(thesisDir).filter((f) => f.endsWith(".pdf")).sort().reverse();
+const files = fs.readdirSync(thesisDir).filter((f) => f.endsWith(".pdf"));
 
 // Ticker to company name mapping
 const companyNames: Record<string, string> = {
@@ -39,6 +39,9 @@ const theses = files.map((file) => {
 		slug,
 	};
 }).filter(Boolean) as { file: string; ticker: string; company: string; date: Date; dateStr: string; slug: string }[];
+
+// Sort by date descending (most recent first)
+theses.sort((a, b) => b.date.getTime() - a.date.getTime());
 ---
 
 <Layout
