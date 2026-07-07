@@ -20,6 +20,10 @@ const path = Astro.url.pathname;
     </li>
     <li class="nav-separator">/</li>
     <li>
+      <a href="/sector-rotation" class:list={{ active: path.startsWith('/sector-rotation') }}>Sector Rotation</a>
+    </li>
+    <li class="nav-separator">/</li>
+    <li>
       <a href="/thesis" class:list={{ active: path.startsWith('/thesis') }}>Thesis</a>
     </li>
     <li class="nav-separator">/</li>

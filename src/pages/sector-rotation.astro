@@ -1,0 +1,302 @@
+---
+import "../styles/article.css";
+
+import Card from "../components/Card.astro";
+import Icon from "../components/Icon.astro";
+import Layout from "../layouts/Layout.astro";
+
+interface Week {
+	week_end: string;
+	regime: string;
+	votes_on: number;
+	votes_total: number;
+	rotation_in: string[];
+	rotation_out: string[];
+}
+
+const modules = import.meta.glob<{ default: Week }>("../data/rotation/*.json", {
+	eager: true,
+});
+const weeks = Object.values(modules)
+	.map((m) => m.default)
+	.sort((a, b) => b.week_end.localeCompare(a.week_end));
+
+const current = weeks[0] ?? null;
+const previous = weeks[1] ?? null;
+const older = weeks.slice(2);
+
+const fmtDate = (iso: string) =>
+	new Date(`${iso}T00:00:00`).toLocaleDateString("en-US", {
+		weekday: "long",
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
+
+const regimeClass = (regime: string) =>
+	regime === "Risk-On" ? "risk-on" : regime === "Risk-Off" ? "risk-off" : "transitional";
+---
+
+<Layout
+	title="Sector Rotation"
+	description="Weekly sector rotation signals — market risk regime and sectors freshly rotating in or out, updated after each Friday close."
+>
+	<div class="left" slot="left">
+		<Card class="toc-card">
+			<h2 class="no-mt">On this page</h2>
+			<ol>
+				<li class="toc-li"><a href="#_top" class="active">This Week</a></li>
+				<li class="toc-li"><a href="#last-week">Last Week</a></li>
+				<li class="toc-li"><a href="#history">History</a></li>
+				<li class="toc-li"><a href="#methodology">Methodology</a></li>
+			</ol>
+		</Card>
+	</div>
+	<article slot="right" data-pagefind-body>
+		<Card>
+			<h1 class="no-mt" id="_top" style="scroll-margin-top: 2rem;">Sector Rotation</h1>
+			<p style="color: #c7c7c7; margin-top: 0.5rem;">
+				Weekly risk regime and sector rotation confirmations, evaluated on Friday closes.
+			</p>
+
+			{current ? (
+				<div class="week-block main">
+					<p class="week-label">Week ending {fmtDate(current.week_end)}</p>
+					<div class={`regime-banner ${regimeClass(current.regime)}`}>
+						<Icon
+							type="lucide"
+							name={current.regime === "Risk-On" ? "trending-up" : current.regime === "Risk-Off" ? "trending-down" : "move-horizontal"}
+							width={28}
+							height={28}
+						/>
+						<span class="regime-name">{current.regime}</span>
+						<span class="regime-votes">{current.votes_on}/{current.votes_total} votes risk-on</span>
+					</div>
+					<div class="rotation-row">
+						<div class="rotation-box">
+							<h3 class="no-mt rot-in-title">Rotation In</h3>
+							{current.rotation_in.length ? (
+								<ul class="sector-list">
+									{current.rotation_in.map((s) => (
+										<li class="sector-chip in">{s}</li>
+									))}
+								</ul>
+							) : (
+								<p class="none-note">None this week</p>
+							)}
+						</div>
+						<div class="rotation-box">
+							<h3 class="no-mt rot-out-title">Rotation Out</h3>
+							{current.rotation_out.length ? (
+								<ul class="sector-list">
+									{current.rotation_out.map((s) => (
+										<li class="sector-chip out">{s}</li>
+									))}
+								</ul>
+							) : (
+								<p class="none-note">None this week</p>
+							)}
+						</div>
+					</div>
+				</div>
+			) : (
+				<p class="none-note">No rotation data published yet.</p>
+			)}
+
+			<h2 id="last-week" style="scroll-margin-top: 4rem;">Last Week</h2>
+
+			{previous ? (
+				<div class="week-block small">
+					<p class="week-label">Week ending {fmtDate(previous.week_end)}</p>
+					<div class={`regime-banner small ${regimeClass(previous.regime)}`}>
+						<span class="regime-name">{previous.regime}</span>
+						<span class="regime-votes">{previous.votes_on}/{previous.votes_total} votes risk-on</span>
+					</div>
+					<div class="rotation-row">
+						<div class="rotation-box">
+							<h3 class="no-mt rot-in-title">Rotation In</h3>
+							{previous.rotation_in.length ? (
+								<ul class="sector-list">
+									{previous.rotation_in.map((s) => (
+										<li class="sector-chip in">{s}</li>
+									))}
+								</ul>
+							) : (
+								<p class="none-note">None</p>
+							)}
+						</div>
+						<div class="rotation-box">
+							<h3 class="no-mt rot-out-title">Rotation Out</h3>
+							{previous.rotation_out.length ? (
+								<ul class="sector-list">
+									{previous.rotation_out.map((s) => (
+										<li class="sector-chip out">{s}</li>
+									))}
+								</ul>
+							) : (
+								<p class="none-note">None</p>
+							)}
+						</div>
+					</div>
+				</div>
+			) : (
+				<p class="none-note">No prior week published yet.</p>
+			)}
+
+			{older.length > 0 && (
+				<>
+					<h2 id="history" style="scroll-margin-top: 4rem;">History</h2>
+					<table class="history-table">
+						<thead>
+							<tr>
+								<th>Week ending</th>
+								<th>Regime</th>
+								<th>Rotation in</th>
+								<th>Rotation out</th>
+							</tr>
+						</thead>
+						<tbody>
+							{older.map((w) => (
+								<tr>
+									<td>{w.week_end}</td>
+									<td><span class={`regime-dot ${regimeClass(w.regime)}`}></span>{w.regime} ({w.votes_on}/{w.votes_total})</td>
+									<td>{w.rotation_in.join(", ") || "—"}</td>
+									<td>{w.rotation_out.join(", ") || "—"}</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</>
+			)}
+
+			<h2 id="methodology" style="scroll-margin-top: 4rem;">Methodology</h2>
+			<p>
+				Every Friday close, each sector's relative-strength ratio against SPY is compared to its
+				50-day moving average. Two consecutive Friday closes above the average — after being below —
+				confirm a rotation <strong>in</strong>; the mirror image confirms a rotation <strong>out</strong>.
+			</p>
+			<p>
+				The risk regime is a five-vote read of market internals: consumer discretionary vs staples,
+				high-yield credit vs investment grade, growth vs utilities, small caps vs large caps, and
+				equal-weight vs cap-weight breadth. Four or more votes on is <strong>Risk-On</strong>, two or
+				three is <strong>Transitional</strong>, fewer is <strong>Risk-Off</strong>. In backtests since
+				2015, fresh rotations carried meaningful forward excess return only when the regime was
+				Risk-On — confirmations in other regimes are tracked for reference, not acted on.
+			</p>
+		</Card>
+	</article>
+</Layout>
+<script src="../scripts/toc.ts"></script>
+<style>
+	.week-label {
+		font-family: "Geist Mono", "Courier New", Courier, monospace;
+		color: #c7c7c7;
+		margin-bottom: 0.75rem;
+	}
+
+	.week-block.main {
+		margin-top: 1.5rem;
+	}
+
+	.regime-banner {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		border: 1px solid;
+		padding: 1rem 1.25rem;
+		margin-bottom: 1rem;
+	}
+
+	.regime-banner.small {
+		padding: 0.5rem 1rem;
+	}
+
+	.regime-name {
+		font-size: 1.5em;
+		font-weight: 800;
+	}
+
+	.regime-banner.small .regime-name {
+		font-size: 1.125em;
+	}
+
+	.regime-votes {
+		color: #c7c7c7;
+		margin-left: auto;
+		font-size: 0.925rem;
+	}
+
+	.risk-on { border-color: #16c79a; color: #16c79a; }
+	.transitional { border-color: #f0a500; color: #f0a500; }
+	.risk-off { border-color: #e94560; color: #e94560; }
+
+	.rotation-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+	}
+
+	@media screen and (max-width: 640px) {
+		.rotation-row {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.rotation-box {
+		border: 1px solid #353535;
+		padding: 1rem;
+	}
+
+	.rot-in-title { color: #16c79a; margin-bottom: 0.75rem; }
+	.rot-out-title { color: #e94560; margin-bottom: 0.75rem; }
+
+	.sector-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.sector-chip {
+		border: 1px solid #353535;
+		padding: 0.25rem 0.6rem;
+		font-size: 0.925rem;
+		font-family: "Geist Mono", "Courier New", Courier, monospace;
+	}
+
+	.sector-chip.in { border-color: #16c79a; }
+	.sector-chip.out { border-color: #e94560; }
+
+	.none-note {
+		color: #888;
+		font-style: italic;
+	}
+
+	.history-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.925rem;
+	}
+
+	.history-table th,
+	.history-table td {
+		border: 1px solid #353535;
+		padding: 0.5rem 0.75rem;
+		text-align: left;
+	}
+
+	.regime-dot {
+		display: inline-block;
+		width: 0.6em;
+		height: 0.6em;
+		border-radius: 50%;
+		margin-right: 0.5em;
+		background: currentColor;
+	}
+
+	.regime-dot.risk-on { color: #16c79a; }
+	.regime-dot.transitional { color: #f0a500; }
+	.regime-dot.risk-off { color: #e94560; }
+</style>

@@ -1,0 +1,13 @@
+{
+  "week_end": "2026-07-02",
+  "regime": "Transitional",
+  "votes_on": 2,
+  "votes_total": 5,
+  "rotation_in": [
+    "Consumer Staples",
+    "Healthcare",
+    "Materials",
+    "Utilities"
+  ],
+  "rotation_out": []
+}
