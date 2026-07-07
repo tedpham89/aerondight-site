@@ -48,7 +48,7 @@ const regimeClass = (regime: string) =>
 				<li class="toc-li"><a href="#_top" class="active">This Week</a></li>
 				<li class="toc-li"><a href="#last-week">Last Week</a></li>
 				<li class="toc-li"><a href="#history">History</a></li>
-				<li class="toc-li"><a href="#methodology">Methodology</a></li>
+				<li class="toc-li"><a href="#key-rules">Key Rules</a></li>
 			</ol>
 		</Card>
 	</div>
@@ -56,7 +56,7 @@ const regimeClass = (regime: string) =>
 		<Card>
 			<h1 class="no-mt" id="_top" style="scroll-margin-top: 2rem;">Sector Rotation</h1>
 			<p style="color: #c7c7c7; margin-top: 0.5rem;">
-				Weekly risk regime and sector rotation confirmations, evaluated on Friday closes.
+				Weekly market risk status and sector rotations, updated after Friday's close.
 			</p>
 
 			{current ? (
@@ -70,7 +70,6 @@ const regimeClass = (regime: string) =>
 							height={28}
 						/>
 						<span class="regime-name">{current.regime}</span>
-						<span class="regime-votes">{current.votes_on}/{current.votes_total} votes risk-on</span>
 					</div>
 					<div class="rotation-row">
 						<div class="rotation-box">
@@ -110,7 +109,6 @@ const regimeClass = (regime: string) =>
 					<p class="week-label">Week ending {fmtDate(previous.week_end)}</p>
 					<div class={`regime-banner small ${regimeClass(previous.regime)}`}>
 						<span class="regime-name">{previous.regime}</span>
-						<span class="regime-votes">{previous.votes_on}/{previous.votes_total} votes risk-on</span>
 					</div>
 					<div class="rotation-row">
 						<div class="rotation-box">
@@ -159,7 +157,7 @@ const regimeClass = (regime: string) =>
 							{older.map((w) => (
 								<tr>
 									<td>{w.week_end}</td>
-									<td><span class={`regime-dot ${regimeClass(w.regime)}`}></span>{w.regime} ({w.votes_on}/{w.votes_total})</td>
+									<td><span class={`regime-dot ${regimeClass(w.regime)}`}></span>{w.regime}</td>
 									<td>{w.rotation_in.join(", ") || "—"}</td>
 									<td>{w.rotation_out.join(", ") || "—"}</td>
 								</tr>
@@ -169,19 +167,16 @@ const regimeClass = (regime: string) =>
 				</>
 			)}
 
-			<h2 id="methodology" style="scroll-margin-top: 4rem;">Methodology</h2>
+			<h2 id="key-rules" style="scroll-margin-top: 4rem;">Key Rules</h2>
 			<p>
-				Every Friday close, each sector's relative-strength ratio against SPY is compared to its
-				50-day moving average. Two consecutive Friday closes above the average — after being below —
-				confirm a rotation <strong>in</strong>; the mirror image confirms a rotation <strong>out</strong>.
+				When the risk regime is <strong>Risk-On</strong> on a Friday and a sector is rotating in,
+				statistics since 2015 show a high chance of beating the S&amp;P 500 by buying that sector's
+				leading stocks on Monday and holding for the next three weeks. Rotations that occur in
+				Transitional or Risk-Off regimes have not shown that edge and are tracked for reference only.
 			</p>
-			<p>
-				The risk regime is a five-vote read of market internals: consumer discretionary vs staples,
-				high-yield credit vs investment grade, growth vs utilities, small caps vs large caps, and
-				equal-weight vs cap-weight breadth. Four or more votes on is <strong>Risk-On</strong>, two or
-				three is <strong>Transitional</strong>, fewer is <strong>Risk-Off</strong>. In backtests since
-				2015, fresh rotations carried meaningful forward excess return only when the regime was
-				Risk-On — confirmations in other regimes are tracked for reference, not acted on.
+			<p class="disclaimer">
+				<strong>Disclaimer:</strong> This is not investment advice. Everything on this page is for
+				educational purposes only. Invest at your own risk.
 			</p>
 		</Card>
 	</article>
@@ -220,10 +215,12 @@ const regimeClass = (regime: string) =>
 		font-size: 1.125em;
 	}
 
-	.regime-votes {
-		color: #c7c7c7;
-		margin-left: auto;
-		font-size: 0.925rem;
+	.disclaimer {
+		color: #888;
+		font-size: 0.875rem;
+		border-top: 1px solid #353535;
+		padding-top: 1rem;
+		margin-top: 1.5rem;
 	}
 
 	.risk-on { border-color: #16c79a; color: #16c79a; }
