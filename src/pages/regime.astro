@@ -4,6 +4,34 @@ import "../styles/article.css";
 import Card from "../components/Card.astro";
 import Icon from "../components/Icon.astro";
 import Layout from "../layouts/Layout.astro";
+
+interface CurrentRegime {
+	date: string;
+	label: string;
+	agreement: boolean;
+	confidence: number;
+}
+
+const regimeModules = import.meta.glob<{ default: CurrentRegime }>(
+	"../data/regime/current.json",
+	{ eager: true },
+);
+const current = Object.values(regimeModules)[0]?.default ?? null;
+
+const REGIME_META: Record<string, { name: string; cls: string; icon: string }> = {
+	bull_broad: { name: "Bull Broad", cls: "bull-broad", icon: "trending-up" },
+	bull_tech: { name: "Bull Tech", cls: "bull-tech", icon: "cpu" },
+	correction: { name: "Correction", cls: "correction", icon: "trending-down" },
+	crisis: { name: "Crisis", cls: "crisis", icon: "alert-triangle" },
+};
+const meta = current ? (REGIME_META[current.label] ?? { name: current.label, cls: "bull-broad", icon: "activity" }) : null;
+
+const fmtDate = (iso: string) =>
+	new Date(`${iso}T00:00:00`).toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
 ---
 
 <Layout
@@ -28,6 +56,19 @@ import Layout from "../layouts/Layout.astro";
 			<p style="color: #c7c7c7; margin-top: 0.5rem;">
 				The first layer of Aerondight's scoring pipeline — detecting what kind of market we're in.
 			</p>
+
+			{current && meta && (
+				<div class={`current-regime ${meta.cls}`}>
+					<Icon type="lucide" name={meta.icon} width={28} height={28} />
+					<div>
+						<div class="current-regime-name">Current Regime: {meta.name}</div>
+						<div class="current-regime-sub">
+							HMM and XGBoost {current.agreement ? "agree" : "disagree"}
+							({Math.round(current.confidence * 100)}% confidence) — as of {fmtDate(current.date)}
+						</div>
+					</div>
+				</div>
+			)}
 
 			<p>
 				Markets don't behave the same way all the time. A momentum strategy that prints money in a tech rally
@@ -135,6 +176,26 @@ import Layout from "../layouts/Layout.astro";
 </Layout>
 <script src="../scripts/toc.ts"></script>
 <style>
+	.current-regime {
+		display: flex;
+		align-items: center;
+		gap: 0.9rem;
+		border: 1px solid;
+		padding: 1rem 1.25rem;
+		margin: 1.25rem 0 1.5rem 0;
+	}
+
+	.current-regime-name {
+		font-size: 1.35em;
+		font-weight: 800;
+	}
+
+	.current-regime-sub {
+		color: #c7c7c7;
+		font-size: 0.925rem;
+		margin-top: 0.2rem;
+	}
+
 	.regime-grid {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
