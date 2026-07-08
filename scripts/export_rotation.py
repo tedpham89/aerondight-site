@@ -9,9 +9,16 @@ OUT. No momentum leaders / basket tickers.
 Idempotent: writes any week missing from src/data/rotation, never rewrites
 existing files (a published week is frozen). Run by scripts/update-rotation.bat
 every Saturday, followed by git commit + push (Cloudflare Pages auto-deploys).
+
+--history N additionally exports the last N completed weeks from the
+research repo's point-in-time backfill rows (run_type='backfill', replayed
+2008-present with no lookahead). Official rows win where both exist.
+Used once 2026-07-08 to seed the site with 10 weeks of history; the
+Saturday automation runs without it (official weeks only).
 """
 from __future__ import annotations
 
+import argparse
 import json
 import sqlite3
 import sys
@@ -26,7 +33,7 @@ IN_STATE = "CONFIRMED IN (fresh)"
 OUT_STATE = "CONFIRMED OUT (fresh)"
 
 
-def export() -> int:
+def export(history_weeks: int = 0) -> int:
     if not PAPER_DB.exists():
         print(f"[export] paper DB not found: {PAPER_DB}", file=sys.stderr)
         return 1
@@ -34,18 +41,24 @@ def export() -> int:
 
     con = sqlite3.connect(f"file:{PAPER_DB}?mode=ro", uri=True)
     try:
-        weeks = [r[0] for r in con.execute(
+        weeks = {w: "official" for (w,) in con.execute(
             "SELECT DISTINCT week_end FROM rotation_signals "
-            "WHERE run_type='official' ORDER BY week_end")]
+            "WHERE run_type='official'")}
+        if history_weeks:
+            for (w,) in con.execute(
+                    "SELECT DISTINCT week_end FROM rotation_signals "
+                    "WHERE run_type='backfill' ORDER BY week_end DESC LIMIT ?",
+                    (history_weeks,)):
+                weeks.setdefault(w, "backfill")
         written = 0
-        for week_end in weeks:
+        for week_end in sorted(weeks):
             out_path = OUT_DIR / f"{week_end}.json"
             if out_path.exists():
                 continue
             rows = con.execute(
                 "SELECT sector, state, regime, votes_on FROM rotation_signals "
-                "WHERE run_type='official' AND week_end=? ORDER BY sector",
-                (week_end,)).fetchall()
+                "WHERE run_type=? AND week_end=? ORDER BY sector",
+                (weeks[week_end], week_end)).fetchall()
             regime, votes_on = rows[0][2], rows[0][3]
             payload = {
                 "week_end": week_end,
@@ -69,4 +82,8 @@ def export() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(export())
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--history", type=int, default=0,
+                    help="Also export the last N weeks from backfill rows")
+    args = ap.parse_args()
+    sys.exit(export(history_weeks=args.history))
