@@ -250,6 +250,22 @@ const regimeClass = (regime: string) =>
 		border: 1px solid #353535;
 		padding: 0.5rem 0.75rem;
 		text-align: left;
+		vertical-align: top;
+	}
+
+	/* date + regime stay on one line; rotation lists get space and wrap
+	   fully so every sector name is readable */
+	.history-table td:nth-child(1),
+	.history-table td:nth-child(2) {
+		white-space: nowrap;
+	}
+
+	.history-table td:nth-child(3),
+	.history-table td:nth-child(4) {
+		white-space: normal;
+		overflow-wrap: normal;
+		min-width: 11rem;
+		width: 38%;
 	}
 
 	.history-table thead th {
