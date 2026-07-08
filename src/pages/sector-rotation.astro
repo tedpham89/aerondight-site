@@ -22,8 +22,7 @@ const weeks = Object.values(modules)
 	.sort((a, b) => b.week_end.localeCompare(a.week_end));
 
 const current = weeks[0] ?? null;
-const previous = weeks[1] ?? null;
-const older = weeks.slice(2);
+const older = weeks.slice(1);
 
 const fmtDate = (iso: string) =>
 	new Date(`${iso}T00:00:00`).toLocaleDateString("en-US", {
@@ -46,7 +45,6 @@ const regimeClass = (regime: string) =>
 			<h2 class="no-mt">On this page</h2>
 			<ol>
 				<li class="toc-li"><a href="#_top" class="active">This Week</a></li>
-				<li class="toc-li"><a href="#last-week">Last Week</a></li>
 				<li class="toc-li"><a href="#history">History</a></li>
 				<li class="toc-li"><a href="#key-rules">Key Rules</a></li>
 			</ol>
@@ -102,68 +100,31 @@ const regimeClass = (regime: string) =>
 				<p class="none-note">No rotation data published yet.</p>
 			)}
 
-			<h2 id="last-week" style="scroll-margin-top: 4rem;">Last Week</h2>
-
-			{previous ? (
-				<div class="week-block small">
-					<p class="week-label">Week ending {fmtDate(previous.week_end)}</p>
-					<div class={`regime-banner small ${regimeClass(previous.regime)}`}>
-						<span class="regime-name">{previous.regime}</span>
-					</div>
-					<div class="rotation-row">
-						<div class="rotation-box">
-							<h3 class="no-mt rot-in-title">Rotation In</h3>
-							{previous.rotation_in.length ? (
-								<ul class="sector-list">
-									{previous.rotation_in.map((s) => (
-										<li class="sector-chip in">{s}</li>
-									))}
-								</ul>
-							) : (
-								<p class="none-note">None</p>
-							)}
-						</div>
-						<div class="rotation-box">
-							<h3 class="no-mt rot-out-title">Rotation Out</h3>
-							{previous.rotation_out.length ? (
-								<ul class="sector-list">
-									{previous.rotation_out.map((s) => (
-										<li class="sector-chip out">{s}</li>
-									))}
-								</ul>
-							) : (
-								<p class="none-note">None</p>
-							)}
-						</div>
-					</div>
-				</div>
-			) : (
-				<p class="none-note">No prior week published yet.</p>
-			)}
-
 			{older.length > 0 && (
 				<>
 					<h2 id="history" style="scroll-margin-top: 4rem;">History</h2>
-					<table class="history-table">
-						<thead>
-							<tr>
-								<th>Week ending</th>
-								<th>Regime</th>
-								<th>Rotation in</th>
-								<th>Rotation out</th>
-							</tr>
-						</thead>
-						<tbody>
-							{older.map((w) => (
+					<div class="history-scroll">
+						<table class="history-table">
+							<thead>
 								<tr>
-									<td>{w.week_end}</td>
-									<td><span class={`regime-dot ${regimeClass(w.regime)}`}></span>{w.regime}</td>
-									<td>{w.rotation_in.join(", ") || "—"}</td>
-									<td>{w.rotation_out.join(", ") || "—"}</td>
+									<th>Week ending</th>
+									<th>Regime</th>
+									<th>Rotation in</th>
+									<th>Rotation out</th>
 								</tr>
-							))}
-						</tbody>
-					</table>
+							</thead>
+							<tbody>
+								{older.map((w) => (
+									<tr>
+										<td>{w.week_end}</td>
+										<td><span class={`regime-dot ${regimeClass(w.regime)}`}></span>{w.regime}</td>
+										<td>{w.rotation_in.join(", ") || "—"}</td>
+										<td>{w.rotation_out.join(", ") || "—"}</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
 				</>
 			)}
 
@@ -271,6 +232,13 @@ const regimeClass = (regime: string) =>
 		font-style: italic;
 	}
 
+	.history-scroll {
+		max-height: 22rem;
+		overflow-y: auto;
+		overflow-x: auto;
+		border: 1px solid #353535;
+	}
+
 	.history-table {
 		width: 100%;
 		border-collapse: collapse;
@@ -282,6 +250,13 @@ const regimeClass = (regime: string) =>
 		border: 1px solid #353535;
 		padding: 0.5rem 0.75rem;
 		text-align: left;
+	}
+
+	.history-table thead th {
+		position: sticky;
+		top: 0;
+		background: #181818;
+		z-index: 1;
 	}
 
 	.regime-dot {
