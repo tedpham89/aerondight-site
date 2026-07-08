@@ -1,0 +1,64 @@
+{
+ "signals": [
+  {
+   "date": "2026-07-07",
+   "symbol": "WDC"
+  },
+  {
+   "date": "2026-06-17",
+   "symbol": "SYNA"
+  },
+  {
+   "date": "2026-06-16",
+   "symbol": "FIX"
+  },
+  {
+   "date": "2026-06-15",
+   "symbol": "MTSI"
+  },
+  {
+   "date": "2026-06-10",
+   "symbol": "PII"
+  },
+  {
+   "date": "2026-06-10",
+   "symbol": "FOUR"
+  },
+  {
+   "date": "2026-06-10",
+   "symbol": "ELF"
+  },
+  {
+   "date": "2026-06-10",
+   "symbol": "BRBR"
+  },
+  {
+   "date": "2026-06-09",
+   "symbol": "WING"
+  },
+  {
+   "date": "2026-06-09",
+   "symbol": "FLEX"
+  },
+  {
+   "date": "2026-06-08",
+   "symbol": "LRCX"
+  },
+  {
+   "date": "2026-06-08",
+   "symbol": "IPGP"
+  },
+  {
+   "date": "2026-06-08",
+   "symbol": "GLW"
+  },
+  {
+   "date": "2026-06-03",
+   "symbol": "MRVL"
+  },
+  {
+   "date": "2026-05-29",
+   "symbol": "LITE"
+  }
+ ]
+}

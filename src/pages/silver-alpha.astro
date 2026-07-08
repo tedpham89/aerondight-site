@@ -23,6 +23,22 @@ const excessReturns = trades.map((t) => parseFloat(t[7]));
 const avgExcess = (excessReturns.reduce((a, b) => a + b, 0) / excessReturns.length).toFixed(2);
 const avgDays = Math.round(trades.reduce((a, t) => a + parseInt(t[8]), 0) / trades.length);
 
+// Live signal feeds (date + symbol only, updated daily)
+interface SignalFeed {
+	signals: { date: string; symbol: string }[];
+}
+const feedModules = import.meta.glob<{ default: SignalFeed }>(
+	"../data/signals/*.json",
+	{ eager: true },
+);
+const feeds: Record<string, { date: string; symbol: string }[]> = {};
+for (const [p, m] of Object.entries(feedModules)) {
+	const name = p.split("/").pop()?.replace(".json", "") ?? p;
+	feeds[name] = m.default.signals;
+}
+const silverFeed = feeds["silver"] ?? [];
+const goldFeed = feeds["gold"] ?? [];
+
 // Column display names
 const colNames: Record<string, string> = {
 	symbol: "Symbol",
@@ -47,6 +63,7 @@ const colNames: Record<string, string> = {
 			<h2 class="no-mt">On this page</h2>
 			<ol>
 				<li class="toc-li"><a href="#_top" class="active">Overview</a></li>
+				<li class="toc-li"><a href="#live-signals">Live Signals</a></li>
 				<li class="toc-li"><a href="#oos-definition">Out-of-Sample Definition</a></li>
 				<li class="toc-li"><a href="#performance">Performance</a></li>
 				<li class="toc-li"><a href="#equity-curve">Equity Curve</a></li>
@@ -61,6 +78,37 @@ const colNames: Record<string, string> = {
 			<p style="color: #c7c7c7; margin-top: 0.5rem;">
 				Systematic swing trade strategy — 2023 to Q1 2026 out-of-sample simulation.
 			</p>
+
+			<div id="live-signals" class="signal-row" style="scroll-margin-top: 4rem;">
+				<div class="signal-box">
+					<h3 class="no-mt signal-title silver-title">Signal — Silver</h3>
+					<div class="signal-scroll">
+						<table class="signal-table">
+							<thead><tr><th>Date</th><th>Symbol</th></tr></thead>
+							<tbody>
+								{silverFeed.map((s) => (
+									<tr><td>{s.date}</td><td>{s.symbol}</td></tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+					{silverFeed.length === 0 && <p class="none-note">No signals yet.</p>}
+				</div>
+				<div class="signal-box">
+					<h3 class="no-mt signal-title gold-title">Signal — Gold</h3>
+					<div class="signal-scroll">
+						<table class="signal-table">
+							<thead><tr><th>Date</th><th>Symbol</th></tr></thead>
+							<tbody>
+								{goldFeed.map((s) => (
+									<tr><td>{s.date}</td><td>{s.symbol}</td></tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+					{goldFeed.length === 0 && <p class="none-note">No signals yet.</p>}
+				</div>
+			</div>
 
 			<p>
 				Silver Alpha is a swing trade strategy built on Aerondight's multi-factor scoring engine.
@@ -217,6 +265,64 @@ const colNames: Record<string, string> = {
 
 	.disclosure-section strong {
 		color: #ffffff;
+	}
+
+	.signal-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+		margin: 1.25rem 0 1.5rem 0;
+	}
+
+	@media screen and (max-width: 640px) {
+		.signal-row {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.signal-box {
+		border: 1px solid #353535;
+		padding: 1rem;
+	}
+
+	.signal-title {
+		margin-bottom: 0.75rem;
+		font-family: "Geist Mono", "Courier New", Courier, monospace;
+	}
+
+	.silver-title { color: #c0c0c0; }
+	.gold-title { color: #d4a940; }
+
+	.signal-scroll {
+		max-height: 14rem;
+		overflow-y: auto;
+		border: 1px solid #353535;
+	}
+
+	.signal-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.925rem;
+	}
+
+	.signal-table th,
+	.signal-table td {
+		border: 1px solid #353535;
+		padding: 0.4rem 0.75rem;
+		text-align: left;
+		white-space: nowrap;
+	}
+
+	.signal-table thead th {
+		position: sticky;
+		top: 0;
+		background: #181818;
+		z-index: 1;
+	}
+
+	.none-note {
+		color: #888;
+		font-style: italic;
 	}
 
 	.stats-grid {

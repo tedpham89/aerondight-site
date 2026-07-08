@@ -21,6 +21,10 @@ python scripts\export_rotation.py
 if errorlevel 1 (
     echo [site-daily] rotation export failed.
 )
+python scripts\export_signals.py
+if errorlevel 1 (
+    echo [site-daily] signals export failed.
+)
 
 git add src/data
 git diff --cached --quiet

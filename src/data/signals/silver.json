@@ -1,0 +1,112 @@
+{
+ "signals": [
+  {
+   "date": "2026-07-06",
+   "symbol": "FSLR"
+  },
+  {
+   "date": "2026-07-02",
+   "symbol": "PTC"
+  },
+  {
+   "date": "2026-07-02",
+   "symbol": "ADSK"
+  },
+  {
+   "date": "2026-06-26",
+   "symbol": "AYI"
+  },
+  {
+   "date": "2026-06-25",
+   "symbol": "INTU"
+  },
+  {
+   "date": "2026-06-15",
+   "symbol": "NEM"
+  },
+  {
+   "date": "2026-06-05",
+   "symbol": "INCY"
+  },
+  {
+   "date": "2026-06-03",
+   "symbol": "SNX"
+  },
+  {
+   "date": "2026-06-01",
+   "symbol": "QLYS"
+  },
+  {
+   "date": "2026-06-01",
+   "symbol": "PLTR"
+  },
+  {
+   "date": "2026-05-29",
+   "symbol": "RMBS"
+  },
+  {
+   "date": "2026-05-29",
+   "symbol": "APP"
+  },
+  {
+   "date": "2026-05-14",
+   "symbol": "NTAP"
+  },
+  {
+   "date": "2026-05-11",
+   "symbol": "WDC"
+  },
+  {
+   "date": "2026-05-11",
+   "symbol": "MLI"
+  },
+  {
+   "date": "2026-05-11",
+   "symbol": "GEN"
+  },
+  {
+   "date": "2026-05-08",
+   "symbol": "DELL"
+  },
+  {
+   "date": "2026-05-08",
+   "symbol": "DBX"
+  },
+  {
+   "date": "2026-05-07",
+   "symbol": "STX"
+  },
+  {
+   "date": "2026-05-07",
+   "symbol": "NXPI"
+  },
+  {
+   "date": "2026-05-07",
+   "symbol": "NVDA"
+  },
+  {
+   "date": "2026-05-05",
+   "symbol": "TSM"
+  },
+  {
+   "date": "2026-05-05",
+   "symbol": "SNDK"
+  },
+  {
+   "date": "2026-05-05",
+   "symbol": "FSLR"
+  },
+  {
+   "date": "2026-05-04",
+   "symbol": "FIX"
+  },
+  {
+   "date": "2026-05-01",
+   "symbol": "MU"
+  },
+  {
+   "date": "2026-05-01",
+   "symbol": "GD"
+  }
+ ]
+}
