@@ -17,6 +17,7 @@ const config = defineConfig({
 		sitemap(),
 		spectre({
 			name: 'Aerondight Systems',
+			themeColor: '#1f8a63',
 			openGraph: {
 				home: {
 					title: 'Aerondight Systems',
