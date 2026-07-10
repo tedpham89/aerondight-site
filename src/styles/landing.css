@@ -2,12 +2,17 @@
    Loaded only by the landing page (via LandingLayout). Overrides the Spectre
    purple with the landing's cold palette so the shared Navbar matches. */
 
-:root {
+/* Accent re-point (purple → green) lives on body.landing, not :root:
+   descendants resolve vars by DOM inheritance, so this beats globals.css
+   regardless of bundle order. */
+body.landing {
 	--primary: #1f8a63;
 	--primary-rgb: 31, 138, 99;
 	--primary-light: #3fd68f;
 	--primary-lightest: #7fe7b6;
+}
 
+:root {
 	--ground: #0a1118;
 	--hairline: rgba(160, 190, 210, 0.14);
 	--panel: rgba(14, 23, 32, 0.72);
