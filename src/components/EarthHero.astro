@@ -1,0 +1,175 @@
+---
+interface Props {
+	/** Atmosphere tint as [r, g, b] — keyed off the public regime label */
+	tint: [number, number, number];
+}
+
+const { tint } = Astro.props;
+const [tintR, tintG, tintB] = tint;
+---
+
+<canvas id="earth-hero" aria-hidden="true"></canvas>
+<div class="earth-veil" aria-hidden="true"></div>
+
+<style>
+	#earth-hero {
+		position: fixed;
+		inset: 0;
+		width: 100vw;
+		height: 100vh;
+		z-index: -2;
+		display: block;
+		background: #070d13;
+	}
+
+	.earth-veil {
+		position: fixed;
+		inset: 0;
+		z-index: -1;
+		pointer-events: none;
+		background: linear-gradient(
+			180deg,
+			rgba(10, 17, 24, 0.6) 0%,
+			rgba(10, 17, 24, 0.2) 30%,
+			rgba(10, 17, 24, 0) 60%
+		);
+	}
+</style>
+
+<script is:inline define:vars={{ tintR, tintG, tintB }}>
+	const cv = document.getElementById("earth-hero");
+	const ctx = cv.getContext("2d");
+	const glow = [tintR, tintG, tintB];
+	const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+	/* deterministic pseudo-random so city lights don't reshuffle on resize */
+	let seed = 1337;
+	const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+	let W, H, R, CX, CY;
+	let stars = [];
+	let lights = [];
+
+	function layout() {
+		W = cv.width = innerWidth * devicePixelRatio;
+		H = cv.height = innerHeight * devicePixelRatio;
+		cv.style.width = innerWidth + "px";
+		cv.style.height = innerHeight + "px";
+		R = W * 0.78;
+		CX = W * 0.5;
+		CY = H * 0.62 + R; /* limb rises from the bottom of the viewport */
+		seed = 1337;
+		stars = [];
+		lights = [];
+		for (let i = 0; i < 340; i++)
+			stars.push([rnd() * W, rnd() * H * 0.55, rnd() * 1.4 + 0.3, rnd()]);
+		/* city-light clusters scattered along the visible limb band */
+		for (let c = 0; c < 26; c++) {
+			const a = Math.PI * 1.5 + (rnd() - 0.5) * 1.25;
+			const rr = R * (0.985 - rnd() * 0.11);
+			const cx = CX + Math.cos(a) * rr;
+			const cyy = CY + Math.sin(a) * rr;
+			const n = 6 + Math.floor(rnd() * 26);
+			const spread = R * 0.028 * (0.4 + rnd());
+			for (let i = 0; i < n; i++) {
+				const dx = (rnd() - 0.5) * spread * 2;
+				const dy = (rnd() - 0.5) * spread;
+				lights.push([cx + dx, cyy + dy, rnd() * 1.5 + 0.5, rnd()]);
+			}
+		}
+		draw(0);
+	}
+
+	function draw(t) {
+		ctx.clearRect(0, 0, W, H);
+		const sky = ctx.createLinearGradient(0, 0, 0, H);
+		sky.addColorStop(0, "#070D13");
+		sky.addColorStop(1, "#0A141C");
+		ctx.fillStyle = sky;
+		ctx.fillRect(0, 0, W, H);
+
+		for (const [x, y, r, p] of stars) {
+			const tw = reduced ? 0.8 : 0.55 + 0.45 * Math.sin(t / 1400 + p * 20);
+			ctx.globalAlpha = tw * 0.8;
+			ctx.fillStyle = "#C9D8E4";
+			ctx.beginPath();
+			ctx.arc(x, y, r, 0, 7);
+			ctx.fill();
+		}
+		ctx.globalAlpha = 1;
+
+		/* atmosphere glow — regime-tinted */
+		const [gr, gg, gb] = glow;
+		const atm = ctx.createRadialGradient(CX, CY, R * 0.985, CX, CY, R * 1.12);
+		atm.addColorStop(0, `rgba(${gr},${gg},${gb},0.55)`);
+		atm.addColorStop(0.25, `rgba(${gr},${gg},${gb},0.16)`);
+		atm.addColorStop(1, "rgba(0,0,0,0)");
+		ctx.fillStyle = atm;
+		ctx.beginPath();
+		ctx.arc(CX, CY, R * 1.14, 0, 7);
+		ctx.fill();
+
+		/* night disk */
+		const disk = ctx.createRadialGradient(CX, CY - R * 0.6, R * 0.2, CX, CY, R);
+		disk.addColorStop(0, "#0D1A22");
+		disk.addColorStop(0.85, "#08121A");
+		disk.addColorStop(1, "#0B1E28");
+		ctx.fillStyle = disk;
+		ctx.beginPath();
+		ctx.arc(CX, CY, R, 0, 7);
+		ctx.fill();
+
+		/* thin bright limb line */
+		ctx.strokeStyle = `rgba(${gr},${gg},${gb},0.85)`;
+		ctx.lineWidth = Math.max(1.6, R * 0.0012);
+		ctx.beginPath();
+		ctx.arc(CX, CY, R, Math.PI * 1.05, Math.PI * 1.95);
+		ctx.stroke();
+
+		/* the terminator — real UT. Sun over lon 0 at 12:00 UT; view centred on the Americas (−90°). */
+		const now = new Date();
+		const uth = now.getUTCHours() + now.getUTCMinutes() / 60;
+		const sunLon = 15 * (12 - uth);
+		const rel = (((sunLon - -90) / 180) * Math.PI) / 2;
+		const dayOffset = Math.cos(rel * 2) * R * 0.9;
+		ctx.save();
+		ctx.beginPath();
+		ctx.arc(CX, CY, R, 0, 7);
+		ctx.clip();
+		const day = ctx.createRadialGradient(
+			CX + dayOffset, CY - R * 0.15, R * 0.1,
+			CX + dayOffset, CY - R * 0.15, R * 1.05
+		);
+		day.addColorStop(0, "rgba(147,190,224,0.50)");
+		day.addColorStop(0.45, "rgba(110,160,200,0.22)");
+		day.addColorStop(0.75, "rgba(80,120,160,0.05)");
+		day.addColorStop(1, "rgba(0,0,0,0)");
+		ctx.fillStyle = day;
+		ctx.beginPath();
+		ctx.arc(CX + dayOffset, CY - R * 0.15, R * 1.05, 0, 7);
+		ctx.fill();
+		ctx.restore();
+
+		/* city lights on the night side */
+		for (const [x, y, r, p] of lights) {
+			if ((x - CX) ** 2 + (y - CY) ** 2 > R * R * 0.995) continue;
+			const distDay = Math.hypot(x - (CX + dayOffset), y - (CY - R * 0.15));
+			if (distDay < R * 0.55) continue;
+			const fl = reduced ? 0.85 : 0.6 + 0.4 * Math.sin(t / 900 + p * 40);
+			ctx.globalAlpha = fl * 0.9;
+			ctx.fillStyle = "#E8C27A";
+			ctx.beginPath();
+			ctx.arc(x, y, r * devicePixelRatio * 0.7, 0, 7);
+			ctx.fill();
+		}
+		ctx.globalAlpha = 1;
+	}
+
+	function loop(t) {
+		draw(t);
+		if (!reduced) requestAnimationFrame(loop);
+	}
+	addEventListener("resize", layout);
+	layout();
+	if (!reduced) requestAnimationFrame(loop);
+</script>

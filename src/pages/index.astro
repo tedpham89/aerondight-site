@@ -1,198 +1,231 @@
 ---
-import "../styles/index.css";
-
 import { getCollection, getEntry, render } from "astro:content";
 import { name, openGraph } from "spectre:globals";
-import ProfilePicture from "../assets/pfp.png";
-import Card from "../components/Card.astro";
-import Icon from "../components/Icon.astro";
-import ImageGlow from "../components/ImageGlow.astro";
-import Layout from "../layouts/Layout.astro";
+import EarthHero from "../components/EarthHero.astro";
+import LandingLayout from "../layouts/LandingLayout.astro";
 
-const [posts, about, workExperience, quickInfo, socials] =
-	await Promise.all([
-		getCollection("posts", (post) => post.data.draft !== true),
-		getEntry("other", "about"),
-		getCollection("workExperience"),
-		getCollection("quickInfo"),
-		getCollection("socials"),
-	]);
+import regime from "../data/regime/current.json";
+import goldSignals from "../data/signals/gold.json";
+import silverSignals from "../data/signals/silver.json";
+
+const [posts, about] = await Promise.all([
+	getCollection("posts", (post) => post.data.draft !== true),
+	getEntry("other", "about"),
+]);
 
 const { Content: About } = await render(about!);
+
+// latest weekly rotation snapshot (files are named YYYY-MM-DD.json)
+const rotationFiles = import.meta.glob<{
+	week_end: string;
+	regime: string;
+	votes_on: number;
+	votes_total: number;
+	rotation_in: string[];
+	rotation_out: string[];
+}>("../data/rotation/*.json", { eager: true, import: "default" });
+const rotation = Object.entries(rotationFiles).sort(([a], [b]) =>
+	b.localeCompare(a),
+)[0][1];
+
+// atmosphere tint keyed off the public 4-state regime label
+const TINTS: Record<string, [number, number, number]> = {
+	bull_broad: [63, 214, 143],
+	bull_tech: [82, 205, 190],
+	correction: [217, 151, 63],
+	crisis: [199, 90, 212],
+};
+const tint = TINTS[regime.label] ?? [127, 178, 228];
+const tintCss = `rgb(${tint[0]}, ${tint[1]}, ${tint[2]})`;
+const regimeDisplay = regime.label.replace("_", " ").toUpperCase();
+
+// merged signal feed, most recent first
+const feed = [
+	...silverSignals.signals.map((s) => ({ ...s, feed: "SILVER" })),
+	...goldSignals.signals.map((s) => ({ ...s, feed: "GOLD" })),
+]
+	.sort((a, b) => b.date.localeCompare(a.date))
+	.slice(0, 8);
+
+// signals in the trailing 30 days, relative to the regime as-of date
+const cutoff = new Date(regime.date);
+cutoff.setDate(cutoff.getDate() - 30);
+const cutoffStr = cutoff.toISOString().slice(0, 10);
+const signals30d =
+	silverSignals.signals.filter((s) => s.date >= cutoffStr).length +
+	goldSignals.signals.filter((s) => s.date >= cutoffStr).length;
+
+const latestPosts = posts
+	.sort((a, b) => b.data.createdAt.getTime() - a.data.createdAt.getTime())
+	.slice(0, 3);
 ---
 
-<Layout
+<LandingLayout
 	title={openGraph.home.title || name}
 	description={openGraph.home.description}
 	pagefindIgnore
 >
-	<div class="layout-grid-left" slot="left">
-		<Card class="flex-col-card">
-			<ImageGlow
-				quality={100}
-				width={120}
-				height={120}
-				src={ProfilePicture}
-				alt="Aerondight Systems"
-				loading="eager"
-			/>
-			<h2>{name}</h2>
-			<ul class="overview-list">
-				{
-					quickInfo.map((info) => (
-						<li>
-							<Icon
-								type={info.data.icon.type}
-								name={info.data.icon.name as any}
-								width={24}
-								height={24}
-								class="glow-icon"
-							/>
-							<span>{info.data.text}</span>
-						</li>
-					))
-				}
-			</ul>
-		</Card>
-		<Card>
-			<h3 class="no-mt">Links</h3>
-			<ul class="overview-list">
-				{
-					socials.map((item) => (
-						<li>
-							<a href={item.data.link} class="socials-link">
-								<Icon
-									type={item.data.icon.type}
-									name={item.data.icon.name as any}
-									width={24}
-									height={24}
-									class="glow-icon"
-								/>
-								<span>{item.data.text}</span>
-							</a>
-						</li>
-					))
-				}
-				<li>
-					<a href="/contact" class="socials-link">
-						<Icon
-							type="lucide"
-							name="mail"
-							width={24}
-							height={24}
-							class="glow-icon"
-						/>
-						<span>Contact</span>
+	<EarthHero tint={tint} />
+
+	<div class="landing-hero" style={`--regime-tint: ${tintCss}`}>
+		<div class="eyebrow">
+			<span class="live-chip"><span class="live-dot"></span>{regimeDisplay}</span>
+			<span>SYSTEMATIC EQUITY RESEARCH · ~900 US STOCKS · AS OF {regime.date}</span>
+			<span id="ut-clock"></span>
+		</div>
+		<h1>The market,<br />observed</h1>
+		<p class="lede">
+			Aerondight Systems scores roughly <strong>900 US stocks</strong> daily —
+			multi-factor models under a machine-learned regime classifier. The
+			classifier currently reads <strong>{regimeDisplay.toLowerCase()}</strong>
+			at {Math.round(regime.confidence * 100)}% confidence{regime.agreement
+				? ", with both models in agreement"
+				: ""}. Every signal is published here, building a track record one
+			entry at a time.
+		</p>
+		<div class="scrollcue">Scroll — the terminator is live</div>
+	</div>
+
+	<div class="tiles">
+		<div class="tile">
+			<div class="lab">Regime</div>
+			<div class="val" style={`color: ${tintCss}`}>{regimeDisplay}</div>
+			<div class="sub">HMM + validator</div>
+		</div>
+		<div class="tile">
+			<div class="lab">Confidence</div>
+			<div class="val">{Math.round(regime.confidence * 100)}<small>%</small></div>
+			<div class="sub">{regime.agreement ? "models agree" : "models disagree"}</div>
+		</div>
+		<div class="tile">
+			<div class="lab">Rotation risk</div>
+			<div class="val">{rotation.votes_on}<small>/{rotation.votes_total}</small></div>
+			<div class="sub">{rotation.regime.toLowerCase()} · wk {rotation.week_end.slice(5)}</div>
+		</div>
+		<div class="tile">
+			<div class="lab">Signals · 30d</div>
+			<div class="val">{signals30d}</div>
+			<div class="sub">silver + gold feeds</div>
+		</div>
+		<div class="tile">
+			<div class="lab">Coverage</div>
+			<div class="val">~900</div>
+			<div class="sub">S&P 500 + S&P 400</div>
+		</div>
+	</div>
+
+	<section>
+		<div class="eyebrow"><b>LIVE</b> UPDATED DAILY AFTER MARKET CLOSE</div>
+		<h2>Instruments</h2>
+		<p class="sectionlede">
+			Three live systems, each with its own page: what the market is doing, what
+			the strategy is buying, and where sector leadership is rotating.
+		</p>
+		<div class="instruments">
+			<a href="/regime" class="instrument">
+				<span class="ilab">Regime — Live</span>
+				<h3>Market Regime Classification</h3>
+				<p>
+					HMM + XGBoost system detecting four distinct market states to
+					modulate equity scoring.
+				</p>
+				<span class="istat">Today: <b>{regimeDisplay}</b> · {Math.round(regime.confidence * 100)}% conf</span>
+			</a>
+			<a href="/silver-alpha" class="instrument">
+				<span class="ilab">Silver Alpha — Live</span>
+				<h3>Silver Alpha Strategy</h3>
+				<p>
+					94 trades, 62% win rate, +325% return — full trade log with
+					out-of-sample results from 2023–2026.
+				</p>
+				<span class="istat">Latest signal: <b>{feed[0]?.symbol}</b> · {feed[0]?.date}</span>
+			</a>
+			<a href="/sector-rotation" class="instrument">
+				<span class="ilab">Sector Rotation — Live</span>
+				<h3>Sector Rotation</h3>
+				<p>
+					Weekly market risk status and sector rotation confirmations, updated
+					after each Friday close.
+				</p>
+				<span class="istat">Risk votes: <b>{rotation.votes_on}/{rotation.votes_total}</b> · {rotation.regime}</span>
+			</a>
+		</div>
+	</section>
+
+	<section>
+		<div class="eyebrow"><b>FEED</b> DATE + SYMBOL · PUBLISHED AS THEY FIRE</div>
+		<h2>Recent signals</h2>
+		<p class="sectionlede">
+			The eight most recent entries across both live feeds. Full history and
+			outcomes live on the Silver Alpha page.
+		</p>
+		<div class="ledger">
+			<div class="lrow lhead">
+				<span>Date</span><span>Feed</span><span>Symbol</span><span></span>
+			</div>
+			{
+				feed.map((s) => (
+					<a href="/silver-alpha" class="lrow">
+						<span class="ldate">{s.date}</span>
+						<span>
+							<span class={`feed-chip feed-${s.feed.toLowerCase()}`}>{s.feed}</span>
+						</span>
+						<span class="lsym">{s.symbol}</span>
+						<span class="ldesc">ENTRY SIGNAL</span>
 					</a>
-				</li>
-			</ul>
-		</Card>
-	</div>
-	<div class="layout-grid-right" slot="right">
-		<Card>
-			<div class="header-container">
-				<Icon
-					type="lucide"
-					name="user"
-					width={24}
-					height={24}
-					class="glow-icon"
-				/>
-				<h2>About</h2>
-			</div>
-			<div class="prose">
-				<About />
-			</div>
-		</Card>
-		<Card>
-			<div class="header-container">
-				<Icon
-					type="lucide"
-					name="layout-grid"
-					width={24}
-					height={24}
-					class="glow-icon"
-				/>
-				<h2>Explore</h2>
-			</div>
-			<div class="content-container">
-				<a href="/regime" class="post-container">
-					<div class="post-header">
-						<h3>Market Regime Classification - Live</h3>
-					</div>
-					<span>HMM + XGBoost system detecting four distinct market states to modulate equity scoring.</span>
-				</a>
-				<a href="/silver-alpha" class="post-container">
-					<div class="post-header">
-						<h3>Silver Alpha Strategy - Live</h3>
-					</div>
-					<span>94 trades, 62% win rate, +325% return — full trade log with out-of-sample results from 2023–2026.</span>
-				</a>
-				<a href="/sector-rotation" class="post-container">
-					<div class="post-header">
-						<h3>Sector Rotation - Live</h3>
-					</div>
-					<span>Weekly market risk status and sector rotation confirmations, updated after each Friday close.</span>
-				</a>
-			</div>
-		</Card>
-		<Card>
-			<div class="header-container">
-				<Icon
-					type="lucide"
-					name="file-text"
-					width={24}
-					height={24}
-					class="glow-icon"
-				/>
-				<h2>Latest Research</h2>
-			</div>
-			<div class="content-container">
-				{
-					posts
-						.sort(
-							(a, b) => b.data.createdAt.getTime() - a.data.createdAt.getTime(),
-						)
-						.slice(0, 3)
-						.map((post) => (
-							<a href={`/research/${post.id}`} class="post-container">
-								<div class="post-header">
-									<h3>{post.data.title}</h3>
-									<span class="post-date">
-										{post.data.createdAt.toLocaleDateString()}
-									</span>
-								</div>
-								<span>{post.data.description}</span>
-							</a>
-						))
-				}
-			</div>
-		</Card>
-		<Card>
-			<div class="header-container">
-				<Icon
-					type="lucide"
-					name="briefcase-business"
-					width={24}
-					height={24}
-					class="glow-icon"
-				/>
-				<h2>Work Experience</h2>
-			</div>
-			<div class="work-experience-container">
-				{
-					workExperience.reverse().map((entry) => (
-						<div class="work-experience-entry">
-							<span class="work-experience-duration">
-								{entry.data.duration}
-							</span>
-							<h3 class="work-experience-company">{entry.data.company}</h3>
-							<span class="work-experience-role">{entry.data.title}</span>
-							<p class="work-experience-desc">{entry.data.description}</p>
+				))
+			}
+		</div>
+		<div class="ledger-note">Signals are published for transparency, not as recommendations.</div>
+	</section>
+
+	<section>
+		<div class="eyebrow"><b>NOTES</b> METHODOLOGY · BACKTESTS · SAMPLES</div>
+		<h2>Latest research</h2>
+		<div>
+			{
+				latestPosts.map((post) => (
+					<a href={`/research/${post.id}`} class="postrow">
+						<div class="phead">
+							<h3>{post.data.title}</h3>
+							<span class="pdate">{post.data.createdAt.toLocaleDateString("en-CA")}</span>
 						</div>
-					))
-				}
+						<p>{post.data.description}</p>
+					</a>
+				))
+			}
+		</div>
+	</section>
+
+	<section>
+		<div class="eyebrow"><b>ABOUT</b> WHO RUNS THIS</div>
+		<h2>The operator</h2>
+		<div class="about-grid">
+			<div class="prose"><About /></div>
+			<div class="about-facts">
+				<span><b>Since 2024</b> — founder &amp; quantitative researcher</span>
+				<span><b>Stack</b> — Python · SQLite · quant modeling</span>
+				<span><b>AI</b> — Claude API + GPT API research generation</span>
+				<span><a href="/contact">Contact →</a></span>
 			</div>
-		</Card>
-	</div>
-</Layout>
+		</div>
+	</section>
+
+	<footer>
+		AERONDIGHT SYSTEMS · EDUCATIONAL PURPOSES ONLY · NOT INVESTMENT ADVICE<br />
+		<b>RENDERED LIVE IN CANVAS · NIGHT SIDE OF EARTH · TERMINATOR TRACKS REAL UT</b>
+	</footer>
+
+	<script is:inline>
+		const el = document.getElementById("ut-clock");
+		function utTick() {
+			const n = new Date();
+			el.textContent =
+				String(n.getUTCHours()).padStart(2, "0") + ":" +
+				String(n.getUTCMinutes()).padStart(2, "0") + ":" +
+				String(n.getUTCSeconds()).padStart(2, "0") + " UT";
+		}
+		utTick();
+		setInterval(utTick, 1000);
+	</script>
+</LandingLayout>

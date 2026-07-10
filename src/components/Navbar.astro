@@ -5,7 +5,10 @@ import Icon from "./Icon.astro";
 const path = Astro.url.pathname;
 ---
 <nav>
-  <a class="site-title" href="/">{name}</a>
+  <a class="site-title" href="/">
+    <img src="/img/sword-logo.png" alt="" class="site-logo" width="141" height="300" />
+    {name}
+  </a>
   <ul>
     <li>
       <a href="/" class:list={{ active: path === '/' }}>Home</a>
@@ -190,6 +193,15 @@ const path = Astro.url.pathname;
     text-decoration: none;
     font-size: 1.25em;
     z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+  }
+
+  .site-logo {
+    height: 3.4em;
+    width: auto;
+    filter: drop-shadow(0 0 8px rgba(96, 165, 220, .55));
   }
 
   nav ul {

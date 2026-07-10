@@ -1,0 +1,445 @@
+/* ── Aerondight landing — night-side instrument skin ──
+   Loaded only by the landing page (via LandingLayout). Overrides the Spectre
+   purple with the landing's cold palette so the shared Navbar matches. */
+
+:root {
+	--primary: #1f8a63;
+	--primary-rgb: 31, 138, 99;
+	--primary-light: #3fd68f;
+	--primary-lightest: #7fe7b6;
+
+	--ground: #0a1118;
+	--hairline: rgba(160, 190, 210, 0.14);
+	--panel: rgba(14, 23, 32, 0.72);
+	--ink: #e6eef3;
+	--ink2: #93a6b3;
+	--ink-muted: #5e7280;
+	--on-bright: #3fd68f;
+	--neutral-bright: #7fb2e4;
+	--crit: #c75ad4;
+	--warn: #d9973f;
+	--mono: "Geist Mono", "Courier New", Courier, monospace;
+}
+
+html:has(body.landing) {
+	background: var(--ground);
+}
+
+body.landing {
+	/* transparent so the fixed Earth canvas (z-index -2) shows through */
+	background: transparent;
+	color: var(--ink);
+}
+
+/* hero */
+.landing-hero {
+	min-height: 82vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.landing .eyebrow {
+	font-family: var(--mono);
+	font-size: 11px;
+	letter-spacing: 0.22em;
+	color: var(--ink-muted);
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: 18px;
+	text-transform: uppercase;
+}
+
+.landing .eyebrow .live-chip {
+	color: var(--regime-tint, var(--on-bright));
+	border: 1px solid color-mix(in srgb, var(--regime-tint, var(--on-bright)) 45%, transparent);
+	padding: 2px 8px;
+	border-radius: 2px;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.landing .eyebrow .live-dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--regime-tint, var(--on-bright));
+	box-shadow: 0 0 8px var(--regime-tint, var(--on-bright));
+	animation: landing-pulse 3s ease-in-out infinite;
+}
+
+@keyframes landing-pulse {
+	50% { opacity: 0.4; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.landing .eyebrow .live-dot { animation: none; }
+}
+
+.landing-hero h1 {
+	font-size: clamp(42px, 6.5vw, 80px);
+	letter-spacing: 0.13em;
+	font-weight: 700;
+	margin: 0 0 22px;
+	text-transform: uppercase;
+	color: #c7d6df;
+	text-wrap: balance;
+	line-height: 1.06;
+}
+
+.landing-hero .lede {
+	max-width: 54ch;
+	color: var(--ink2);
+	font-size: 17px;
+	margin: 0;
+}
+
+.landing-hero .lede strong {
+	color: var(--ink);
+	font-weight: 600;
+}
+
+.landing-hero .scrollcue {
+	margin-top: 52px;
+	font-family: var(--mono);
+	font-size: 10px;
+	letter-spacing: 0.24em;
+	color: var(--ink-muted);
+	border-left: 1px solid var(--hairline);
+	padding-left: 14px;
+	text-transform: uppercase;
+}
+
+/* telemetry tiles */
+.landing .tiles {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+	gap: 1px;
+	background: var(--hairline);
+	border: 1px solid var(--hairline);
+	margin: 6vh 0 12vh;
+}
+
+.landing .tile {
+	background: var(--panel);
+	padding: 18px 20px 16px;
+}
+
+.landing .tile .lab {
+	font-family: var(--mono);
+	font-size: 10px;
+	letter-spacing: 0.2em;
+	color: var(--ink-muted);
+	margin-bottom: 8px;
+	text-transform: uppercase;
+}
+
+.landing .tile .val {
+	font-family: var(--mono);
+	font-size: 24px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+}
+
+.landing .tile .val small {
+	font-size: 12px;
+	font-weight: 400;
+	color: var(--ink2);
+	margin-left: 5px;
+	letter-spacing: 0.1em;
+}
+
+.landing .tile .sub {
+	font-family: var(--mono);
+	font-size: 10px;
+	letter-spacing: 0.12em;
+	margin-top: 6px;
+	color: var(--ink2);
+}
+
+/* sections */
+.landing section {
+	margin-bottom: 12vh;
+}
+
+.landing section .eyebrow b {
+	color: var(--on-bright);
+	font-weight: 400;
+	border: 1px solid rgba(63, 214, 143, 0.4);
+	padding: 2px 7px;
+	border-radius: 2px;
+}
+
+.landing h2 {
+	font-size: clamp(24px, 3vw, 34px);
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	font-weight: 700;
+	color: #c7d6df;
+	margin: 8px 0 10px;
+	text-wrap: balance;
+}
+
+.landing .sectionlede {
+	color: var(--ink2);
+	max-width: 62ch;
+	margin: 0 0 30px;
+}
+
+/* instrument cards (Explore) */
+.landing .instruments {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 14px;
+}
+
+.landing .instrument {
+	background: var(--panel);
+	border: 1px solid var(--hairline);
+	padding: 20px 22px 18px;
+	color: var(--ink);
+	text-decoration: none;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.landing .instrument:hover,
+.landing .instrument:focus-visible {
+	border-color: rgba(63, 214, 143, 0.5);
+	background: rgba(31, 138, 99, 0.08);
+	text-decoration: none;
+	color: var(--ink);
+	outline: none;
+}
+
+.landing .instrument .ilab {
+	font-family: var(--mono);
+	font-size: 10px;
+	letter-spacing: 0.2em;
+	color: var(--on-bright);
+	text-transform: uppercase;
+}
+
+.landing .instrument h3 {
+	margin: 0;
+	font-size: 19px;
+	letter-spacing: 0.02em;
+}
+
+.landing .instrument p {
+	margin: 0;
+	color: var(--ink2);
+	font-size: 14px;
+}
+
+.landing .instrument .istat {
+	margin-top: auto;
+	padding-top: 10px;
+	font-family: var(--mono);
+	font-size: 11px;
+	letter-spacing: 0.12em;
+	color: var(--ink-muted);
+	border-top: 1px solid var(--hairline);
+	text-transform: uppercase;
+}
+
+.landing .instrument .istat b {
+	color: var(--ink);
+	font-weight: 700;
+}
+
+/* signal ledger */
+.landing .ledger {
+	border-top: 1px solid var(--hairline);
+}
+
+.landing .lrow {
+	display: grid;
+	grid-template-columns: 120px 90px 1fr 110px;
+	gap: 18px;
+	align-items: center;
+	padding: 11px 6px;
+	border-bottom: 1px solid var(--hairline);
+	font-family: var(--mono);
+	font-size: 12px;
+	color: var(--ink);
+	text-decoration: none;
+}
+
+a.lrow:hover,
+a.lrow:focus-visible {
+	background: rgba(78, 143, 208, 0.07);
+	text-decoration: none;
+	color: var(--ink);
+	outline: none;
+}
+
+.landing .lrow.lhead {
+	color: var(--ink-muted);
+	font-size: 10px;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+}
+
+.landing .lrow .ldate {
+	color: var(--ink2);
+	font-variant-numeric: tabular-nums;
+}
+
+.landing .lrow .lsym {
+	font-weight: 700;
+	letter-spacing: 0.08em;
+}
+
+.landing .lrow .ldesc {
+	color: var(--ink-muted);
+	font-size: 11px;
+	letter-spacing: 0.1em;
+}
+
+.landing .feed-chip {
+	display: inline-block;
+	padding: 3px 8px;
+	border-radius: 2px;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	font-size: 10px;
+	text-align: center;
+}
+
+.landing .feed-silver {
+	border: 1px solid rgba(199, 214, 223, 0.45);
+	color: #c7d6df;
+}
+
+.landing .feed-gold {
+	border: 1px solid rgba(217, 151, 63, 0.55);
+	color: #e0b060;
+}
+
+.landing .ledger-note {
+	font-family: var(--mono);
+	font-size: 10px;
+	letter-spacing: 0.14em;
+	color: var(--ink-muted);
+	margin-top: 14px;
+	text-transform: uppercase;
+}
+
+/* research list */
+.landing .postrow {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 16px 6px;
+	border-bottom: 1px solid var(--hairline);
+	color: var(--ink);
+	text-decoration: none;
+}
+
+.landing .postrow:first-of-type {
+	border-top: 1px solid var(--hairline);
+}
+
+.landing .postrow:hover,
+.landing .postrow:focus-visible {
+	background: rgba(78, 143, 208, 0.07);
+	text-decoration: none;
+	color: var(--ink);
+	outline: none;
+}
+
+.landing .postrow .phead {
+	display: flex;
+	justify-content: space-between;
+	gap: 16px;
+	align-items: baseline;
+}
+
+.landing .postrow h3 {
+	margin: 0;
+	font-size: 17px;
+}
+
+.landing .postrow .pdate {
+	font-family: var(--mono);
+	font-size: 11px;
+	color: var(--ink-muted);
+	letter-spacing: 0.1em;
+	white-space: nowrap;
+}
+
+.landing .postrow p {
+	margin: 0;
+	color: var(--ink2);
+	font-size: 14px;
+	max-width: 75ch;
+}
+
+/* about strip */
+.landing .about-grid {
+	display: grid;
+	grid-template-columns: 1.4fr 1fr;
+	gap: 40px;
+	align-items: start;
+}
+
+.landing .about-grid .prose p {
+	color: var(--ink2);
+	margin: 0 0 14px;
+	max-width: 60ch;
+}
+
+.landing .about-facts {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	font-family: var(--mono);
+	font-size: 12px;
+	letter-spacing: 0.08em;
+	color: var(--ink2);
+	border-left: 1px solid var(--hairline);
+	padding-left: 22px;
+}
+
+.landing .about-facts b {
+	color: var(--ink);
+	font-weight: 700;
+}
+
+/* footer */
+.landing footer {
+	border-top: 1px solid var(--hairline);
+	padding: 32px 0 56px;
+	font-family: var(--mono);
+	font-size: 10px;
+	letter-spacing: 0.2em;
+	color: var(--ink-muted);
+	line-height: 2.1;
+	text-transform: uppercase;
+}
+
+.landing footer b {
+	color: var(--ink2);
+	font-weight: 400;
+}
+
+@media screen and (max-width: 760px) {
+	.landing .lrow {
+		grid-template-columns: 96px 76px 1fr;
+	}
+	.landing .lrow .ldesc {
+		display: none;
+	}
+	.landing .about-grid {
+		grid-template-columns: 1fr;
+	}
+	.landing-hero {
+		min-height: 70vh;
+	}
+}
