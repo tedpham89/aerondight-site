@@ -3,9 +3,19 @@ import "../styles/reset.css";
 import "../styles/globals.css";
 
 import { name, themeColor, twitterHandle } from "spectre:globals";
-import Background from "../components/Background.astro";
+import EarthHero from "../components/EarthHero.astro";
 import LayoutGrid from "../components/LayoutGrid.astro";
 import Navbar from "../components/Navbar.astro";
+import regime from "../data/regime/current.json";
+
+// same night sky as the landing — atmosphere tint keyed off the public regime label
+const TINTS: Record<string, [number, number, number]> = {
+	bull_broad: [63, 214, 143],
+	bull_tech: [82, 205, 190],
+	correction: [217, 151, 63],
+	crisis: [199, 90, 212],
+};
+const tint = TINTS[regime.label] ?? [127, 178, 228];
 
 interface Props {
 	title: string;
@@ -75,6 +85,6 @@ const { title, description, image, pagefindIgnore, article } = Astro.props;
 			</LayoutGrid>
 			<slot name="404" />
 		</main>
-		<Background />
+		<EarthHero tint={tint} />
 	</body>
 </html>
