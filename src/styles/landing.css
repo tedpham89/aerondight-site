@@ -99,6 +99,48 @@ body.landing {
 	font-weight: 600;
 }
 
+.landing-hero .hero-cta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px;
+	margin-top: 30px;
+}
+
+.landing-hero .cta-btn {
+	font-family: var(--mono);
+	font-size: 12px;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	text-decoration: none;
+	padding: 12px 22px;
+	border: 1px solid var(--hairline);
+	border-radius: 2px;
+	color: var(--ink);
+	background: var(--panel);
+	transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.landing-hero .cta-btn:hover,
+.landing-hero .cta-btn:focus-visible {
+	border-color: rgba(63, 214, 143, 0.5);
+	background: rgba(31, 138, 99, 0.08);
+	text-decoration: none;
+	color: var(--ink);
+	outline: none;
+}
+
+.landing-hero .cta-btn.cta-primary {
+	border-color: rgba(63, 214, 143, 0.5);
+	color: var(--on-bright);
+}
+
+.landing-hero .cta-btn.cta-primary:hover,
+.landing-hero .cta-btn.cta-primary:focus-visible {
+	border-color: var(--on-bright);
+	background: rgba(31, 138, 99, 0.16);
+	color: var(--on-bright);
+}
+
 .landing-hero .scrollcue {
 	margin-top: 52px;
 	font-family: var(--mono);

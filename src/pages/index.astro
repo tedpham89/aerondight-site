@@ -47,6 +47,10 @@ const TINTS: Record<string, [number, number, number]> = {
 const tint = TINTS[regime.label] ?? [127, 178, 228];
 const tintCss = `rgb(${tint[0]}, ${tint[1]}, ${tint[2]})`;
 const regimeDisplay = regime.label.replace("_", " ").toUpperCase();
+const regimeTitle = regime.label
+	.split("_")
+	.map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+	.join(" ");
 
 // signal feeds, most recent first, shown separately (silver = strategy, gold = ML model)
 const silverFeed = [...silverSignals.signals]
@@ -122,17 +126,20 @@ const fmtWeek = (iso: string) =>
 			<span>SYSTEMATIC EQUITY RESEARCH · ~900 US STOCKS · AS OF {regime.date}</span>
 			<span id="ut-clock"></span>
 		</div>
-		<h1>The market,<br />observed</h1>
+		<h1>The market, systematized</h1>
 		<p class="lede">
-			Aerondight Systems scores roughly <strong>900 US stocks</strong> daily —
-			multi-factor models under a machine-learned regime classifier. The
-			classifier currently reads <strong>{regimeDisplay.toLowerCase()}</strong>
-			at {Math.round(regime.confidence * 100)}% confidence{regime.agreement
+			Aerondight Systems evaluates roughly <strong>900 U.S. stocks</strong> each
+			day using systematic equity models and a machine-learned market-regime
+			classifier. The current regime is <strong>{regimeTitle}</strong>{regime.agreement
 				? ", with both models in agreement"
-				: ""}. Every signal is published here, building a track record one
-			entry at a time.
+				: ""}. Every signal is timestamped and published live—building a
+			transparent record, one decision at a time.
 		</p>
-		<div class="scrollcue">Scroll — the terminator is live</div>
+		<div class="hero-cta">
+			<a href="/silver-alpha" class="cta-btn cta-primary">View Live Signals</a>
+			<a href="/sector-rotation" class="cta-btn">Explore Sector Rotation</a>
+		</div>
+		<div class="scrollcue">Scroll — explore the system</div>
 	</div>
 
 	<div class="tiles">
@@ -333,8 +340,7 @@ const fmtWeek = (iso: string) =>
 	</section>
 
 	<footer>
-		AERONDIGHT SYSTEMS · EDUCATIONAL PURPOSES ONLY · NOT INVESTMENT ADVICE<br />
-		<b>RENDERED LIVE IN CANVAS · NIGHT SIDE OF EARTH · TERMINATOR TRACKS REAL UT</b>
+		AERONDIGHT SYSTEMS · EDUCATIONAL PURPOSES ONLY · NOT INVESTMENT ADVICE
 	</footer>
 
 	<script is:inline>
