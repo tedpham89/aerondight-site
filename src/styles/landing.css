@@ -160,6 +160,51 @@ body.landing {
 	color: var(--ink2);
 }
 
+/* rotation bar — second telemetry strip, weekly cadence */
+.landing .tiles.rotation-bar {
+	margin-top: -10vh; /* sits right under the daily tiles */
+}
+
+.landing .tile .val.val-date {
+	font-size: 19px;
+	line-height: 1.7;
+}
+
+.landing .tile .val.val-none {
+	color: var(--ink-muted);
+}
+
+.landing .tile .val.rot-on { color: var(--on-bright); }
+.landing .tile .val.rot-off { color: var(--crit); }
+.landing .tile .val.rot-trans { color: var(--neutral-bright); }
+
+.landing .sector-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 5px;
+	min-height: 32px;
+	align-content: flex-start;
+}
+
+.landing .sector-chip {
+	font-family: var(--mono);
+	font-size: 10px;
+	letter-spacing: 0.08em;
+	padding: 3px 8px;
+	border-radius: 2px;
+	white-space: nowrap;
+}
+
+.landing .sector-chip.chip-in {
+	border: 1px solid rgba(63, 214, 143, 0.45);
+	color: var(--on-bright);
+}
+
+.landing .sector-chip.chip-out {
+	border: 1px solid rgba(199, 90, 212, 0.5);
+	color: var(--crit);
+}
+
 /* sections */
 .landing section {
 	margin-bottom: 12vh;
@@ -253,14 +298,32 @@ body.landing {
 	font-weight: 700;
 }
 
-/* signal ledger */
+/* signal ledgers — two feeds side by side */
+.landing .feeds-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 40px;
+}
+
+.landing .feed-title {
+	font-family: var(--mono);
+	font-size: 11px;
+	letter-spacing: 0.16em;
+	color: var(--ink2);
+	text-transform: uppercase;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 12px;
+}
+
 .landing .ledger {
 	border-top: 1px solid var(--hairline);
 }
 
 .landing .lrow {
 	display: grid;
-	grid-template-columns: 120px 90px 1fr 110px;
+	grid-template-columns: 130px 1fr;
 	gap: 18px;
 	align-items: center;
 	padding: 11px 6px;
@@ -430,11 +493,11 @@ a.lrow:focus-visible {
 }
 
 @media screen and (max-width: 760px) {
-	.landing .lrow {
-		grid-template-columns: 96px 76px 1fr;
+	.landing .feeds-grid {
+		grid-template-columns: 1fr;
 	}
-	.landing .lrow .ldesc {
-		display: none;
+	.landing .tiles.rotation-bar {
+		margin-top: -8vh;
 	}
 	.landing .about-grid {
 		grid-template-columns: 1fr;

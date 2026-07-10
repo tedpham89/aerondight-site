@@ -1,4 +1,6 @@
 ---
+import fs from "node:fs";
+import path from "node:path";
 import { getCollection, getEntry, render } from "astro:content";
 import { name, openGraph } from "spectre:globals";
 import EarthHero from "../components/EarthHero.astro";
@@ -28,6 +30,13 @@ const rotation = Object.entries(rotationFiles).sort(([a], [b]) =>
 	b.localeCompare(a),
 )[0][1];
 
+const rotationClass =
+	rotation.regime === "Risk-On"
+		? "rot-on"
+		: rotation.regime === "Risk-Off"
+			? "rot-off"
+			: "rot-trans";
+
 // atmosphere tint keyed off the public 4-state regime label
 const TINTS: Record<string, [number, number, number]> = {
 	bull_broad: [63, 214, 143],
@@ -39,13 +48,13 @@ const tint = TINTS[regime.label] ?? [127, 178, 228];
 const tintCss = `rgb(${tint[0]}, ${tint[1]}, ${tint[2]})`;
 const regimeDisplay = regime.label.replace("_", " ").toUpperCase();
 
-// merged signal feed, most recent first
-const feed = [
-	...silverSignals.signals.map((s) => ({ ...s, feed: "SILVER" })),
-	...goldSignals.signals.map((s) => ({ ...s, feed: "GOLD" })),
-]
+// signal feeds, most recent first, shown separately (silver = strategy, gold = ML model)
+const silverFeed = [...silverSignals.signals]
 	.sort((a, b) => b.date.localeCompare(a.date))
-	.slice(0, 8);
+	.slice(0, 6);
+const goldFeed = [...goldSignals.signals]
+	.sort((a, b) => b.date.localeCompare(a.date))
+	.slice(0, 6);
 
 // signals in the trailing 30 days, relative to the regime as-of date
 const cutoff = new Date(regime.date);
@@ -55,9 +64,49 @@ const signals30d =
 	silverSignals.signals.filter((s) => s.date >= cutoffStr).length +
 	goldSignals.signals.filter((s) => s.date >= cutoffStr).length;
 
+// thesis PDFs from public/thesis (same parsing as the thesis page)
+const companyNames: Record<string, string> = {
+	ENS: "Ensign Group",
+	FIX: "Comfort Systems USA",
+	IBKR: "Interactive Brokers",
+	JLL: "Jones Lang LaSalle",
+	MU: "Micron Technology",
+	NVDA: "NVIDIA",
+	GD: "General Dynamics",
+	PRI: "Primerica",
+	INCY: "Incyte",
+	NEM: "Newmont",
+	TSM: "Taiwan Semiconductor",
+	NXPI: "NXP Semiconductors",
+};
+const thesisDir = path.join(process.cwd(), "public/thesis");
+const theses = fs
+	.readdirSync(thesisDir)
+	.map((file) => {
+		const match = file.match(/^public_([A-Z]+)_(\d{4}-\d{2}-\d{2})\.pdf$/);
+		if (!match) return null;
+		const [, ticker, dateStr] = match;
+		return {
+			ticker,
+			company: companyNames[ticker] || ticker,
+			dateStr,
+			slug: `${ticker.toLowerCase()}-${dateStr}`,
+		};
+	})
+	.filter((t): t is NonNullable<typeof t> => t !== null)
+	.sort((a, b) => b.dateStr.localeCompare(a.dateStr));
+const latestTheses = theses.slice(0, 3);
+
 const latestPosts = posts
 	.sort((a, b) => b.data.createdAt.getTime() - a.data.createdAt.getTime())
 	.slice(0, 3);
+
+const fmtWeek = (iso: string) =>
+	new Date(`${iso}T00:00:00`).toLocaleDateString("en-US", {
+		month: "short",
+		day: "numeric",
+		year: "numeric",
+	});
 ---
 
 <LandingLayout
@@ -98,11 +147,6 @@ const latestPosts = posts
 			<div class="sub">{regime.agreement ? "models agree" : "models disagree"}</div>
 		</div>
 		<div class="tile">
-			<div class="lab">Rotation risk</div>
-			<div class="val">{rotation.votes_on}<small>/{rotation.votes_total}</small></div>
-			<div class="sub">{rotation.regime.toLowerCase()} · wk {rotation.week_end.slice(5)}</div>
-		</div>
-		<div class="tile">
 			<div class="lab">Signals · 30d</div>
 			<div class="val">{signals30d}</div>
 			<div class="sub">silver + gold feeds</div>
@@ -111,6 +155,45 @@ const latestPosts = posts
 			<div class="lab">Coverage</div>
 			<div class="val">~900</div>
 			<div class="sub">S&P 500 + S&P 400</div>
+		</div>
+	</div>
+
+	<div class="tiles rotation-bar">
+		<div class="tile">
+			<div class="lab">Week ending</div>
+			<div class="val val-date">{fmtWeek(rotation.week_end)}</div>
+			<div class="sub">sector rotation · weekly</div>
+		</div>
+		<div class="tile">
+			<div class="lab">Risk status</div>
+			<div class={`val ${rotationClass}`}>{rotation.regime.toUpperCase()}</div>
+			<div class="sub">{rotation.votes_on}/{rotation.votes_total} votes on</div>
+		</div>
+		<div class="tile">
+			<div class="lab">Rotation in</div>
+			{rotation.rotation_in.length ? (
+				<div class="sector-chips">
+					{rotation.rotation_in.map((s) => (
+						<span class="sector-chip chip-in">{s}</span>
+					))}
+				</div>
+			) : (
+				<div class="val val-none">—</div>
+			)}
+			<div class="sub">{rotation.rotation_in.length ? `${rotation.rotation_in.length} confirmed` : "none this week"}</div>
+		</div>
+		<div class="tile">
+			<div class="lab">Rotation out</div>
+			{rotation.rotation_out.length ? (
+				<div class="sector-chips">
+					{rotation.rotation_out.map((s) => (
+						<span class="sector-chip chip-out">{s}</span>
+					))}
+				</div>
+			) : (
+				<div class="val val-none">—</div>
+			)}
+			<div class="sub">{rotation.rotation_out.length ? `${rotation.rotation_out.length} confirmed` : "none this week"}</div>
 		</div>
 	</div>
 
@@ -138,7 +221,7 @@ const latestPosts = posts
 					94 trades, 62% win rate, +325% return — full trade log with
 					out-of-sample results from 2023–2026.
 				</p>
-				<span class="istat">Latest signal: <b>{feed[0]?.symbol}</b> · {feed[0]?.date}</span>
+				<span class="istat">Latest signal: <b>{silverFeed[0]?.symbol}</b> · {silverFeed[0]?.date}</span>
 			</a>
 			<a href="/sector-rotation" class="instrument">
 				<span class="ilab">Sector Rotation — Live</span>
@@ -147,7 +230,7 @@ const latestPosts = posts
 					Weekly market risk status and sector rotation confirmations, updated
 					after each Friday close.
 				</p>
-				<span class="istat">Risk votes: <b>{rotation.votes_on}/{rotation.votes_total}</b> · {rotation.regime}</span>
+				<span class="istat">This week: <b>{rotation.regime}</b> · {rotation.votes_on}/{rotation.votes_total} votes</span>
 			</a>
 		</div>
 	</section>
@@ -156,27 +239,65 @@ const latestPosts = posts
 		<div class="eyebrow"><b>FEED</b> DATE + SYMBOL · PUBLISHED AS THEY FIRE</div>
 		<h2>Recent signals</h2>
 		<p class="sectionlede">
-			The eight most recent entries across both live feeds. Full history and
-			outcomes live on the Silver Alpha page.
+			The two live feeds, side by side. Silver is the systematic strategy;
+			Gold is the ML alpha model. Full history and outcomes live on the
+			Silver Alpha page.
 		</p>
-		<div class="ledger">
-			<div class="lrow lhead">
-				<span>Date</span><span>Feed</span><span>Symbol</span><span></span>
+		<div class="feeds-grid">
+			<div class="feed-col">
+				<div class="feed-title"><span class="feed-chip feed-silver">SILVER</span> Strategy signals</div>
+				<div class="ledger">
+					<div class="lrow lhead"><span>Date</span><span>Symbol</span></div>
+					{
+						silverFeed.map((s) => (
+							<a href="/silver-alpha" class="lrow">
+								<span class="ldate">{s.date}</span>
+								<span class="lsym">{s.symbol}</span>
+							</a>
+						))
+					}
+				</div>
 			</div>
+			<div class="feed-col">
+				<div class="feed-title"><span class="feed-chip feed-gold">GOLD</span> ML model signals</div>
+				<div class="ledger">
+					<div class="lrow lhead"><span>Date</span><span>Symbol</span></div>
+					{
+						goldFeed.map((s) => (
+							<a href="/silver-alpha" class="lrow">
+								<span class="ldate">{s.date}</span>
+								<span class="lsym">{s.symbol}</span>
+							</a>
+						))
+					}
+				</div>
+			</div>
+		</div>
+		<div class="ledger-note">Signals are published for transparency, not as recommendations.</div>
+	</section>
+
+	<section>
+		<div class="eyebrow"><b>THESIS</b> AI-GENERATED EQUITY RESEARCH · ~$0.005 PER REPORT</div>
+		<h2>Research reports</h2>
+		<p class="sectionlede">
+			Institutional-style single-ticker reports generated by Aerondight's
+			Thesis engine — quantitative signals, fundamentals, and recent news in a
+			structured seven-section analysis.
+		</p>
+		<div>
 			{
-				feed.map((s) => (
-					<a href="/silver-alpha" class="lrow">
-						<span class="ldate">{s.date}</span>
-						<span>
-							<span class={`feed-chip feed-${s.feed.toLowerCase()}`}>{s.feed}</span>
-						</span>
-						<span class="lsym">{s.symbol}</span>
-						<span class="ldesc">ENTRY SIGNAL</span>
+				latestTheses.map((t) => (
+					<a href={`/thesis/${t.slug}`} class="postrow">
+						<div class="phead">
+							<h3>{t.ticker} — {t.company}</h3>
+							<span class="pdate">{t.dateStr}</span>
+						</div>
+						<p>AI-generated equity research report for {t.company}.</p>
 					</a>
 				))
 			}
 		</div>
-		<div class="ledger-note">Signals are published for transparency, not as recommendations.</div>
+		<div class="ledger-note"><a href="/thesis">All {theses.length} reports →</a></div>
 	</section>
 
 	<section>
