@@ -4,7 +4,7 @@
 - **Language:** Python
 - **Database:** SQLite (~2.5M price records, ~80K fundamental records)
 - **Data Provider:** EODHD (end-of-day prices, fundamentals, macro indicators)
-- **AI Integration:** Claude API (Sonnet) for institutional-quality research reports
+- **AI Integration:** Claude API (Opus) for institutional-quality research reports
 - **Deployment:** Runs daily as a production scoring pipeline, not a notebook experiment
 
 ## Universe
@@ -29,7 +29,7 @@
 - Single-ticker, on-demand institutional-quality equity research
 - Claude API generates 7-section analysis from quantitative signals + fundamental data + recent news
 - Output: professional PDF with score history, color-coded signals, and disclaimer
-- Cost: ~$0.005 per report
+- Cost: ~$0.05 per report
 
 ## Operational Discipline
 - **Daily (after close):** Update prices, score all stocks, check entry/exit signals

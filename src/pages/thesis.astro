@@ -25,6 +25,28 @@ const companyNames: Record<string, string> = {
 	NEM: "Newmont",
 	TSM: "Taiwan Semiconductor",
 	NXPI: "NXP Semiconductors",
+	PCTY: "Paylocity",
+	QLYS: "Qualys",
+	PLTR: "Palantir Technologies",
+	SNX: "TD Synnex",
+	DELL: "Dell Technologies",
+	SNDK: "Sandisk",
+	WDC: "Western Digital",
+	INTU: "Intuit",
+	AYI: "Acuity",
+	PTC: "PTC",
+	ADSK: "Autodesk",
+	DBX: "Dropbox",
+	KEX: "Kirby",
+	GEN: "Gen Digital",
+	FSLR: "First Solar",
+	CRUS: "Cirrus Logic",
+	NTAP: "NetApp",
+	SAIC: "Science Applications International",
+	EME: "EMCOR Group",
+	MLI: "Mueller Industries",
+	CTRE: "CareTrust REIT",
+	SPG: "Simon Property Group",
 };
 
 // Parse filename: public_TICKER_YYYY-MM-DD.pdf
@@ -61,7 +83,7 @@ theses.sort((a, b) => b.date.getTime() - a.date.getTime());
 				fundamental data, and recent news into a professional 7-section analysis.
 			</p>
 			<p style="margin-top: 0.75rem; margin-bottom: 0; font-size: 0.825rem; color: #808080;">
-				Cost per report: ~$0.005
+				Cost per report: ~$0.05
 			</p>
 		</Card>
 	</div>
@@ -69,7 +91,7 @@ theses.sort((a, b) => b.date.getTime() - a.date.getTime());
 		<Card>
 			<div class="disclaimer-box">
 				<strong>About these reports.</strong> These are AI-generated equity research reports produced by
-				Aerondight's Thesis engine (powered by Claude Sonnet). They combine quantitative signals,
+				Aerondight's Thesis engine (powered by Claude Opus). They combine quantitative signals,
 				fundamental data, and recent news into structured analyses that I use as one input in my own
 				investment decisions. The reports serve primarily as a sanity check on the quantitative scores
 				and as a way to surface sentiment from recent news — they carry a small weight in my final
