@@ -1,6 +1,10 @@
 {
  "signals": [
   {
+   "date": "2026-07-20",
+   "symbol": "DELL"
+  },
+  {
    "date": "2026-07-08",
    "symbol": "AMD"
   },
