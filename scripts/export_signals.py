@@ -2,11 +2,11 @@
 
 silver.json — L24 entry crossings recomputed from analysis_scores (LT
 crosses 7.50 with the sector-or-fund door, Energy/Utilities excluded).
-gold.json   — V3 new-entrant BUY signals from the balanced paper account
-(v3_paper_trades, action='BUY'; SKIP/already-held rows never create trade
-rows, so no text parsing needed. bootstrap_backfill is set on every row
-in this account and is therefore not usable as a filter — the date window
-+ 60d dedupe do the work instead).
+gold.json   — V3 new-entrant BUY signals from the consistency_h12 paper
+account (v3_paper_trades, action='BUY'; SKIP/already-held rows never
+create trade rows, so no text parsing needed. Switched from the balanced
+account 2026-07-25 — the date window + 60d dedupe handle any bootstrap
+rows, same as before).
 
 Feeds are cumulative, newest first, date + symbol only (deliberately no
 other detail). A symbol already in a feed within the trailing 60 calendar
@@ -33,7 +33,7 @@ PREFERRED = {"Industrials", "Information Technology", "Communication Services"}
 EXCLUDED = {"Energy", "Utilities"}
 LT_THRESHOLD, FUND_MIN = 7.50, 8.0
 DEDUP_DAYS = 60
-V3_BALANCED = "v3_new_top10_d5_m2_h15_paper"
+V3_GOLD_ACCOUNT = "v3_new_top10_d10_m5_h12_paper"  # consistency_h12
 
 
 def l24_crossings(lookback_days: int) -> list[tuple[str, str]]:
@@ -78,13 +78,13 @@ def l24_crossings(lookback_days: int) -> list[tuple[str, str]]:
 
 
 def v3_buys(lookback_days: int) -> list[tuple[str, str]]:
-    """(signal_date, symbol) for balanced-account BUY signals."""
+    """(signal_date, symbol) for consistency_h12 BUY signals."""
     cutoff = (date.today() - timedelta(days=lookback_days * 2)).isoformat()
     con = sqlite3.connect(f"file:{V3_DB}?mode=ro", uri=True)
     rows = con.execute(
         """SELECT signal_date, symbol FROM v3_paper_trades
            WHERE portfolio_name=? AND action='BUY'
-             AND signal_date >= ?""", (V3_BALANCED, cutoff)).fetchall()
+             AND signal_date >= ?""", (V3_GOLD_ACCOUNT, cutoff)).fetchall()
     con.close()
     return [(d, s) for d, s in rows]
 
