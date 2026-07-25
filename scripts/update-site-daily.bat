@@ -26,14 +26,14 @@ if errorlevel 1 (
     echo [site-daily] signals export failed.
 )
 
-git add src/data
+git add src/data public/thesis
 git diff --cached --quiet
 if not errorlevel 1 (
     echo [site-daily] no changes to publish - done.
     exit /b 0
 )
 
-git commit -m "Daily data update (regime / rotation)"
+git commit -m "Daily data update (regime / rotation / thesis)"
 if errorlevel 1 (
     echo [site-daily] commit failed.
     exit /b 1
