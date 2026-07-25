@@ -1,0 +1,15 @@
+{
+  "week_end": "2026-07-24",
+  "regime": "Transitional",
+  "votes_on": 3,
+  "votes_total": 5,
+  "rotation_in": [
+    "Consumer Staples",
+    "Energy",
+    "Real Estate",
+    "Utilities"
+  ],
+  "rotation_out": [
+    "Technology"
+  ]
+}
