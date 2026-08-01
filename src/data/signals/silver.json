@@ -1,6 +1,26 @@
 {
  "signals": [
   {
+   "date": "2026-07-31",
+   "symbol": "TSM"
+  },
+  {
+   "date": "2026-07-31",
+   "symbol": "SNDK"
+  },
+  {
+   "date": "2026-07-31",
+   "symbol": "NVDA"
+  },
+  {
+   "date": "2026-07-31",
+   "symbol": "NTAP"
+  },
+  {
+   "date": "2026-07-31",
+   "symbol": "DBX"
+  },
+  {
    "date": "2026-07-20",
    "symbol": "MU"
   },
