@@ -1,6 +1,38 @@
 {
  "signals": [
   {
+   "date": "2026-08-04",
+   "symbol": "WDAY"
+  },
+  {
+   "date": "2026-08-04",
+   "symbol": "TER"
+  },
+  {
+   "date": "2026-08-04",
+   "symbol": "TEL"
+  },
+  {
+   "date": "2026-08-04",
+   "symbol": "PLTR"
+  },
+  {
+   "date": "2026-08-04",
+   "symbol": "MSA"
+  },
+  {
+   "date": "2026-08-04",
+   "symbol": "DOCU"
+  },
+  {
+   "date": "2026-08-04",
+   "symbol": "BLKB"
+  },
+  {
+   "date": "2026-08-04",
+   "symbol": "APPF"
+  },
+  {
    "date": "2026-08-03",
    "symbol": "PAYC"
   },
