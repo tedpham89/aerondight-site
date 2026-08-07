@@ -1,8 +1,24 @@
 {
  "signals": [
   {
+   "date": "2026-08-06",
+   "symbol": "SANM"
+  },
+  {
+   "date": "2026-08-05",
+   "symbol": "ZBRA"
+  },
+  {
    "date": "2026-08-05",
    "symbol": "QLYS"
+  },
+  {
+   "date": "2026-08-05",
+   "symbol": "IT"
+  },
+  {
+   "date": "2026-08-05",
+   "symbol": "INCY"
   },
   {
    "date": "2026-08-04",
