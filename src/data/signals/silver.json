@@ -1,6 +1,22 @@
 {
  "signals": [
   {
+   "date": "2026-08-07",
+   "symbol": "SHOP"
+  },
+  {
+   "date": "2026-08-07",
+   "symbol": "GEN"
+  },
+  {
+   "date": "2026-08-07",
+   "symbol": "DELL"
+  },
+  {
+   "date": "2026-08-07",
+   "symbol": "CGNX"
+  },
+  {
    "date": "2026-08-06",
    "symbol": "SANM"
   },
