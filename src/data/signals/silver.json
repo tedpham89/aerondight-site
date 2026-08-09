@@ -2,6 +2,14 @@
  "signals": [
   {
    "date": "2026-08-07",
+   "symbol": "TWLO"
+  },
+  {
+   "date": "2026-08-07",
+   "symbol": "TEAM"
+  },
+  {
+   "date": "2026-08-07",
    "symbol": "SHOP"
   },
   {
@@ -15,6 +23,10 @@
   {
    "date": "2026-08-07",
    "symbol": "CGNX"
+  },
+  {
+   "date": "2026-08-07",
+   "symbol": "ARW"
   },
   {
    "date": "2026-08-06",
