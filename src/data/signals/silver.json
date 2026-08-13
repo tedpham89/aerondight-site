@@ -1,6 +1,10 @@
 {
  "signals": [
   {
+   "date": "2026-08-12",
+   "symbol": "TXN"
+  },
+  {
    "date": "2026-08-07",
    "symbol": "TWLO"
   },
