@@ -1,6 +1,14 @@
 {
  "signals": [
   {
+   "date": "2026-08-14",
+   "symbol": "WDC"
+  },
+  {
+   "date": "2026-08-14",
+   "symbol": "STX"
+  },
+  {
    "date": "2026-08-12",
    "symbol": "TXN"
   },

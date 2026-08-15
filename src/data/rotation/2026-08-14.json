@@ -1,0 +1,12 @@
+{
+  "week_end": "2026-08-14",
+  "regime": "Risk-On",
+  "votes_on": 5,
+  "votes_total": 5,
+  "rotation_in": [],
+  "rotation_out": [
+    "Consumer Staples",
+    "Industrials",
+    "Real Estate"
+  ]
+}
