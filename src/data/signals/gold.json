@@ -1,6 +1,10 @@
 {
  "signals": [
   {
+   "date": "2026-08-14",
+   "symbol": "ANET"
+  },
+  {
    "date": "2026-08-07",
    "symbol": "MRVL"
   },
