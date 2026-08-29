@@ -1,0 +1,12 @@
+{
+  "week_end": "2026-08-28",
+  "regime": "Risk-On",
+  "votes_on": 5,
+  "votes_total": 5,
+  "rotation_in": [
+    "Materials"
+  ],
+  "rotation_out": [
+    "Technology"
+  ]
+}
