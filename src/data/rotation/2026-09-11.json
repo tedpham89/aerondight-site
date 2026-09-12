@@ -1,0 +1,12 @@
+{
+  "week_end": "2026-09-11",
+  "regime": "Transitional",
+  "votes_on": 2,
+  "votes_total": 5,
+  "rotation_in": [
+    "Technology"
+  ],
+  "rotation_out": [
+    "Materials"
+  ]
+}
