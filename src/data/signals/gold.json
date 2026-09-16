@@ -1,6 +1,10 @@
 {
  "signals": [
   {
+   "date": "2026-09-15",
+   "symbol": "MRNA"
+  },
+  {
    "date": "2026-09-02",
    "symbol": "OKTA"
   },
