@@ -149,9 +149,9 @@ const fmtWeek = (iso: string) =>
 			<div class="sub">HMM + validator</div>
 		</div>
 		<div class="tile">
-			<div class="lab">Confidence</div>
-			<div class="val">{Math.round(regime.confidence * 100)}<small>%</small></div>
-			<div class="sub">{regime.agreement ? "models agree" : "models disagree"}</div>
+			<div class="lab">Models</div>
+			<div class="val">{regime.agreement ? "Agree" : "Disagree"}</div>
+			<div class="sub">HMM vs validator</div>
 		</div>
 		<div class="tile">
 			<div class="lab">Signals · 30d</div>
@@ -219,7 +219,7 @@ const fmtWeek = (iso: string) =>
 					HMM + XGBoost system detecting four distinct market states to
 					modulate equity scoring.
 				</p>
-				<span class="istat">Today: <b>{regimeDisplay}</b> · {Math.round(regime.confidence * 100)}% conf</span>
+				<span class="istat">Today: <b>{regimeDisplay}</b></span>
 			</a>
 			<a href="/silver-alpha" class="instrument">
 				<span class="ilab">Silver Alpha — Live</span>

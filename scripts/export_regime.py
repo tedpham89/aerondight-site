@@ -25,7 +25,7 @@ def main() -> int:
         return 1
     con = sqlite3.connect(f"file:{MAIN_DB}?mode=ro", uri=True)
     row = con.execute(
-        "SELECT date, hmm_regime_label, regime_agreement, xgb_confidence "
+        "SELECT date, hmm_regime_label, regime_agreement "
         "FROM regime_states ORDER BY date DESC LIMIT 1").fetchone()
     con.close()
     if not row:
@@ -35,7 +35,6 @@ def main() -> int:
         "date": row[0],
         "label": row[1],
         "agreement": bool(row[2]),
-        "confidence": round(float(row[3]), 2),
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     old = OUT.read_text(encoding="utf-8") if OUT.exists() else ""
@@ -45,8 +44,7 @@ def main() -> int:
     else:
         OUT.write_text(new, encoding="utf-8")
         print(f"[regime] wrote {payload['date']} {payload['label']} "
-              f"({'agree' if payload['agreement'] else 'disagree'}, "
-              f"{payload['confidence']:.0%})")
+              f"({'agree' if payload['agreement'] else 'disagree'})")
     return 0
 
 

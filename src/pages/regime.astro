@@ -9,7 +9,6 @@ interface CurrentRegime {
 	date: string;
 	label: string;
 	agreement: boolean;
-	confidence: number;
 }
 
 const regimeModules = import.meta.glob<{ default: CurrentRegime }>(
@@ -63,8 +62,7 @@ const fmtDate = (iso: string) =>
 					<div>
 						<div class="current-regime-name">Current Regime: {meta.name}</div>
 						<div class="current-regime-sub">
-							HMM and XGBoost {current.agreement ? "agree" : "disagree"}
-							({Math.round(current.confidence * 100)}% confidence) — as of {fmtDate(current.date)}
+							HMM and XGBoost {current.agreement ? "agree" : "disagree"} — as of {fmtDate(current.date)}
 						</div>
 					</div>
 				</div>
