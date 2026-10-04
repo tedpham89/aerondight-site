@@ -111,9 +111,23 @@ const colNames: Record<string, string> = {
 			</div>
 
 			<p>
-				Silver Alpha is a swing trade strategy built on Aerondight's multi-factor scoring engine.
-				It uses conviction scores and signal transitions to systematically enter and exit positions
-				in US equities. All decisions are fully systematic — no discretionary overrides.
+				Silver Alpha is a systematic strategy built on Aerondight's multi-factor scoring engine.
+				It uses conviction scores and signal transitions to enter and exit positions in US equities.
+				All decisions are fully systematic — no discretionary overrides.
+			</p>
+
+			<p>
+				Both signals — Silver and Gold — are built and backtested against a 63-trading-day
+				(about three-month) return target. In backtests, most of the average gain arrives between
+				day 50 and day 63, so selling too early tends to give up much of the edge. A reasonable
+				stop-loss is still recommended, around −30%.
+			</p>
+
+			<p>
+				Diversification matters: holding 10 or more positions helps a portfolio absorb a sharp
+				drawdown in any single name, such as a −30% move in one stock. In correction or stress
+				regimes the picture can be different. Readers should apply their own risk management and
+				treat these signals as a reference, not as financial advice.
 			</p>
 
 			<h2 id="oos-definition" style="scroll-margin-top: 4rem;">Out-of-Sample Definition</h2>
