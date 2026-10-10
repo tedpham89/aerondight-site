@@ -1,0 +1,13 @@
+{
+  "week_end": "2026-10-09",
+  "regime": "Transitional",
+  "votes_on": 2,
+  "votes_total": 5,
+  "rotation_in": [
+    "Energy"
+  ],
+  "rotation_out": [
+    "Communication Services",
+    "Healthcare"
+  ]
+}
