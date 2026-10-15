@@ -1,6 +1,10 @@
 {
  "signals": [
   {
+   "date": "2026-10-14",
+   "symbol": "DOCU"
+  },
+  {
    "date": "2026-10-13",
    "symbol": "BLKB"
   },
