@@ -27,6 +27,7 @@ SITE_ROOT = Path(__file__).resolve().parents[1]
 RESEARCH = SITE_ROOT.parent / "equity-research - v2" / "data"
 MAIN_DB = RESEARCH / "equity_research.db"
 V3_DB = RESEARCH / "v3_production.db"
+QUARANTINE_CSV = RESEARCH.parent / "config" / "quarantine_tickers.csv"
 OUT_DIR = SITE_ROOT / "src" / "data" / "signals"
 
 PREFERRED = {"Industrials", "Information Technology", "Communication Services"}
@@ -34,6 +35,18 @@ EXCLUDED = {"Energy", "Utilities"}
 LT_THRESHOLD, FUND_MIN = 7.50, 8.0
 DEDUP_DAYS = 60
 V3_GOLD_ACCOUNT = "v3_new_top10_d10_m5_h12_paper"  # consistency_h12
+
+
+def quarantined() -> set[str]:
+    """Symbols in the research repo's quarantine list (bad/unresolved data)."""
+    if not QUARANTINE_CSV.exists():
+        return set()
+    out = set()
+    for line in QUARANTINE_CSV.read_text(encoding="utf-8").splitlines():
+        t = line.split(",")[0].strip()
+        if t and not t.startswith("#") and t != "symbol":
+            out.add(t if "." in t else f"{t}.US")
+    return out
 
 
 def l24_crossings(lookback_days: int) -> list[tuple[str, str]]:
@@ -119,8 +132,11 @@ def main() -> int:
         print("[signals] research DBs not found", file=sys.stderr)
         return 1
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    n_silver = update_feed(OUT_DIR / "silver.json", l24_crossings(args.seed_days))
-    n_gold = update_feed(OUT_DIR / "gold.json", v3_buys(args.seed_days))
+    q = quarantined()
+    n_silver = update_feed(OUT_DIR / "silver.json",
+                           [x for x in l24_crossings(args.seed_days) if x[1] not in q])
+    n_gold = update_feed(OUT_DIR / "gold.json",
+                         [x for x in v3_buys(args.seed_days) if x[1] not in q])
     print(f"[signals] silver +{n_silver}, gold +{n_gold}")
     return 0
 
