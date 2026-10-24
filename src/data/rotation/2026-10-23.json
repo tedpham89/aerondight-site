@@ -1,0 +1,15 @@
+{
+  "week_end": "2026-10-23",
+  "regime": "Risk-Off",
+  "votes_on": 1,
+  "votes_total": 5,
+  "rotation_in": [
+    "Consumer Staples",
+    "Healthcare",
+    "Materials",
+    "Utilities"
+  ],
+  "rotation_out": [
+    "Technology"
+  ]
+}
