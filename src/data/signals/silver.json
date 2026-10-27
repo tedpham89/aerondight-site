@@ -1,6 +1,10 @@
 {
  "signals": [
   {
+   "date": "2026-10-26",
+   "symbol": "TSM"
+  },
+  {
    "date": "2026-10-20",
    "symbol": "SNDK"
   },
