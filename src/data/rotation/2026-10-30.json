@@ -1,0 +1,12 @@
+{
+  "week_end": "2026-10-30",
+  "regime": "Risk-Off",
+  "votes_on": 1,
+  "votes_total": 5,
+  "rotation_in": [
+    "Consumer Discretionary",
+    "Financials",
+    "Real Estate"
+  ],
+  "rotation_out": []
+}
