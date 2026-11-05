@@ -1,6 +1,10 @@
 {
  "signals": [
   {
+   "date": "2026-11-04",
+   "symbol": "SNOW"
+  },
+  {
    "date": "2026-10-29",
    "symbol": "AEIS"
   },
