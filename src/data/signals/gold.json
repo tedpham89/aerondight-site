@@ -1,6 +1,14 @@
 {
  "signals": [
   {
+   "date": "2026-11-05",
+   "symbol": "SNDK"
+  },
+  {
+   "date": "2026-11-05",
+   "symbol": "INTC"
+  },
+  {
    "date": "2026-11-04",
    "symbol": "SNOW"
   },
