@@ -1,6 +1,14 @@
 {
  "signals": [
   {
+   "date": "2026-11-09",
+   "symbol": "WING"
+  },
+  {
+   "date": "2026-11-09",
+   "symbol": "CNXC"
+  },
+  {
    "date": "2026-11-05",
    "symbol": "SNDK"
   },
