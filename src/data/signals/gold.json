@@ -1,6 +1,10 @@
 {
  "signals": [
   {
+   "date": "2026-11-13",
+   "symbol": "MPWR"
+  },
+  {
    "date": "2026-11-09",
    "symbol": "WING"
   },
