@@ -49,8 +49,23 @@ def quarantined() -> set[str]:
     return out
 
 
+def members() -> set[str]:
+    """Names L24 can enter: today's S&P 500 + S&P 400 members + custom tickers (research config/universe.txt,
+    custom_tickers.txt). Since 2026-11-13 a name that left both indices is never a new signal."""
+    out = set()
+    for name in ("universe.txt", "custom_tickers.txt"):
+        path = RESEARCH.parent / "config" / name
+        if not path.exists():
+            continue
+        for line in path.read_text(encoding="utf-8").splitlines():
+            t = line.split(",")[0].strip()
+            if t and not t.startswith("#"):
+                out.add(t if "." in t else f"{t}.US")
+    return out
+
+
 def l24_crossings(lookback_days: int) -> list[tuple[str, str]]:
-    """(date, symbol) for every L24 entry crossing in the last N score dates."""
+    """(date, symbol) for every L24 entry crossing in the last N score dates (members only)."""
     con = sqlite3.connect(f"file:{MAIN_DB}?mode=ro", uri=True)
     dates = [r[0] for r in con.execute(
         "SELECT DISTINCT date FROM analysis_scores ORDER BY date DESC LIMIT ?",
@@ -66,8 +81,11 @@ def l24_crossings(lookback_days: int) -> list[tuple[str, str]]:
     sector = dict(con.execute("SELECT symbol, sector FROM stock_meta"))
     con.close()
 
+    member = members()
     by_sym: dict[str, dict[str, tuple]] = {}
     for sym, d, lt, fund in rows:
+        if member and sym not in member:
+            continue
         by_sym.setdefault(sym, {})[d] = (lt, fund)
     out = []
     for sym, per_date in by_sym.items():
