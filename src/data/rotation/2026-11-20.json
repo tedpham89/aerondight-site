@@ -1,0 +1,12 @@
+{
+  "week_end": "2026-11-20",
+  "regime": "Risk-Off",
+  "votes_on": 1,
+  "votes_total": 5,
+  "rotation_in": [
+    "Communication Services",
+    "Energy",
+    "Industrials"
+  ],
+  "rotation_out": []
+}
